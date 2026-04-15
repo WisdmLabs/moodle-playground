@@ -3,22 +3,77 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Moodle Playground</title>
+    <title>Moodle Playground — Try Moodle in your browser, no server required</title>
     <meta
       name="description"
-      content="Moodle running in your browser for learning, testing, and prototyping course experiences."
+      content="Moodle Playground runs a full Moodle site entirely in your browser using PHP WebAssembly — zero install, zero hosting. Spin up instant Moodle demos, test plugins and themes, prototype courses, and share reproducible Moodle setups with JSON blueprints."
     >
+    <meta
+      name="keywords"
+      content="Moodle, Moodle demo, Moodle sandbox, Moodle playground, Moodle online, Moodle in browser, Moodle WebAssembly, Moodle WASM, PHP WebAssembly, Moodle blueprint, test Moodle plugins, try Moodle, Moodle themes, Moodle testing, LMS demo, open source LMS, Moodle developer, e-learning"
+    >
+    <meta name="author" content="Área de Tecnología Educativa (ATE)">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#f98012">
+    <link rel="canonical" href="https://ateeducacion.github.io/moodle-playground/">
+
+    <!-- Open Graph / Facebook / LinkedIn -->
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Moodle Playground">
-    <meta property="og:title" content="Moodle Playground">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:url" content="https://ateeducacion.github.io/moodle-playground/">
+    <meta property="og:title" content="Moodle Playground — Try Moodle in your browser, no server required">
     <meta
       property="og:description"
-      content="Moodle running in your browser for learning, testing, and prototyping course experiences."
+      content="A full Moodle site running in your browser via PHP WebAssembly. Instant demos, plugin and theme testing, reproducible course setups with JSON blueprints. No install, no server, no sign-up."
     >
+    <meta property="og:image" content="https://ateeducacion.github.io/moodle-playground/og-image.png">
+    <meta property="og:image:alt" content="Moodle Playground — Moodle running in your browser">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Moodle Playground — Try Moodle in your browser, no server required">
+    <meta
+      name="twitter:description"
+      content="A full Moodle site running in your browser via PHP WebAssembly. Instant demos, plugin and theme testing, reproducible setups with JSON blueprints. No install required."
+    >
+    <meta name="twitter:image" content="https://ateeducacion.github.io/moodle-playground/og-image.png">
+    <meta name="twitter:image:alt" content="Moodle Playground — Moodle running in your browser">
+
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
     <link rel="stylesheet" href="./src/styles/app.css">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Moodle Playground",
+      "url": "https://ateeducacion.github.io/moodle-playground/",
+      "description": "Moodle Playground runs a full Moodle site entirely in your browser using PHP WebAssembly. Spin up instant Moodle demos, test plugins and themes, and prototype courses with reproducible JSON blueprints — no install, no server.",
+      "applicationCategory": "EducationalApplication",
+      "applicationSubCategory": "Learning Management System",
+      "operatingSystem": "Any (runs in a modern web browser)",
+      "browserRequirements": "Requires a modern browser with WebAssembly and Service Worker support (Chrome, Firefox, Edge, Safari).",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "isAccessibleForFree": true,
+      "license": "https://opensource.org/licenses/MIT",
+      "keywords": "Moodle, LMS, WebAssembly, PHP, browser, demo, sandbox, blueprints, plugins, themes",
+      "author": {
+        "@type": "Organization",
+        "name": "Área de Tecnología Educativa (ATE)",
+        "url": "https://www3.gobiernodecanarias.org/medusa/ecoescuela/ate/"
+      },
+      "codeRepository": "https://github.com/ateeducacion/moodle-playground"
+    }
+    </script>
   </head>
   <body data-app="shell">
     <div class="shell">
