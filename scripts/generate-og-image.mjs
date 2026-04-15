@@ -115,7 +115,7 @@ const HTML = `<!doctype html>
       <div class="badge">SQLite</div>
       <div class="badge">Blueprints</div>
     </div>
-    <div class="url">ateeducacion.github.io/moodle-playground</div>
+    <div class="url">moodle-playground.com</div>
   </div>
 </body>
 </html>`;
