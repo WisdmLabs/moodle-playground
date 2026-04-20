@@ -380,6 +380,8 @@ async function handleGenericProxy(targetUrl, request, env) {
     );
   }
 
+  parsedUrl = normalizeSupportedGenericProxyUrl(parsedUrl);
+
   if (!isSupportedGenericProxyUrl(parsedUrl)) {
     return jsonResponse(
       {
@@ -495,7 +497,8 @@ function isSupportedGenericProxyUrl(url) {
   return (
     looksLikeZipUrl(url) ||
     isFacturaScriptsPluginPage(url) ||
-    isGitHubDirectProxyUrl(url)
+    isGitHubDirectProxyUrl(url) ||
+    isGoogleDriveDirectFileUrl(url)
   );
 }
 
@@ -515,6 +518,63 @@ function isGitHubDirectProxyUrl(url) {
   }
 
   return false;
+}
+
+function isGoogleDriveDirectFileUrl(url) {
+  if (url.hostname.toLowerCase() !== "drive.google.com") {
+    return false;
+  }
+
+  if (/^\/file\/d\/[^/]+(?:\/|$)/u.test(url.pathname)) {
+    return true;
+  }
+
+  if (
+    (url.pathname === "/uc" || url.pathname === "/open") &&
+    url.searchParams.has("id")
+  ) {
+    return true;
+  }
+
+  return false;
+}
+
+function normalizeSupportedGenericProxyUrl(url) {
+  if (!isGoogleDriveDirectFileUrl(url)) {
+    return url;
+  }
+
+  const normalized = new URL(url.toString());
+  const fileId = extractGoogleDriveFileId(normalized);
+
+  if (!fileId) {
+    return url;
+  }
+
+  normalized.pathname = "/uc";
+  normalized.search = "";
+
+  const passthroughParams = ["confirm", "resourcekey", "uuid"];
+  for (const key of passthroughParams) {
+    const value = url.searchParams.get(key);
+    if (value) {
+      normalized.searchParams.set(key, value);
+    }
+  }
+
+  normalized.searchParams.set("id", fileId);
+  normalized.searchParams.set("export", "download");
+
+  return normalized;
+}
+
+function extractGoogleDriveFileId(url) {
+  const pathMatch = url.pathname.match(/^\/file\/d\/([^/]+)(?:\/|$)/u);
+  if (pathMatch?.[1]) {
+    return pathMatch[1];
+  }
+
+  return url.searchParams.get("id");
 }
 
 async function maybeHandleDirectGitHubUrl(url, env, request) {
@@ -971,7 +1031,8 @@ function landingPageHtml(origin) {
         <span class="method">GET</span>
         <span class="endpoint-name">URL Proxy</span>
       </div>
-      <div class="endpoint-desc">Proxy any ZIP download URL with CORS headers.</div>
+      <div class="endpoint-desc">Proxy supported ZIP, GitHub resource, or Google Drive file URLs with CORS headers.</div>
+      <div class="endpoint-desc">Drive accepts direct <code>/uc?id=...</code> links and shared <code>/file/d/{id}/view</code> links.</div>
       <div class="url-box">${base}/?url=<span class="param">{full_url}</span></div>
     </div>
 
