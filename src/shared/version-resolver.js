@@ -387,6 +387,7 @@ export function parseQueryParams(urlOrSearchParams) {
     lang: params.get("lang") || params.get("language") || null,
     importSite: params.get("import-site") || null,
     moodlePr: params.get("moodle-pr") || null,
+    mcp: params.get("mcp") || null,
   };
 }
 

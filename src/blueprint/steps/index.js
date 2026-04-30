@@ -8,6 +8,7 @@ import { registerMoodleInstallSteps } from "./moodle-install.js";
 import { registerMoodleModuleSteps } from "./moodle-modules.js";
 import { registerMoodlePluginSteps } from "./moodle-plugins.js";
 import { registerMoodleUserSteps } from "./moodle-users.js";
+import { registerMoodleBackupSteps } from "./moodle-backup.js";
 import { registerRequestSteps } from "./request.js";
 
 /** @type {Map<string, (step: object, context: object) => Promise<void>>} */
@@ -37,3 +38,4 @@ registerMoodleEnrolSteps(registerStep);
 registerMoodleModuleSteps(registerStep);
 registerMoodlePluginSteps(registerStep);
 registerMoodleDatabaseSteps(registerStep);
+registerMoodleBackupSteps(registerStep);
