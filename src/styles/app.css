@@ -911,6 +911,60 @@ button.danger:hover {
   text-align: center;
 }
 
+/* ── Seamless mode (embedded, no chrome) ──────────── */
+body.is-seamless .browser-toolbar { display: none; }
+body.is-seamless .side-panel { display: none; }
+body.is-seamless .workspace {
+  grid-template-columns: 1fr;
+  height: 100vh;
+  height: 100dvh;
+  margin-top: 0;
+}
+body.is-seamless .viewport { height: 100vh; height: 100dvh; }
+body.is-seamless .viewport iframe { border: none; }
+body.is-seamless .settings-popover,
+body.is-seamless .settings-popover-overlay { display: none !important; }
+
+/* ── Lazy boot splash ────────────────────────────── */
+.lazy-splash {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 1rem;
+  background: var(--bg-surface);
+  color: var(--text);
+}
+
+.lazy-splash h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-heading);
+}
+
+.lazy-splash p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.lazy-splash button {
+  padding: 12px 32px;
+  font-size: 16px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.lazy-splash button:hover {
+  background: var(--accent-hover);
+}
+
 /* ── Responsive ───────────────────────────────────── */
 @media (max-width: 1080px) {
   .workspace {

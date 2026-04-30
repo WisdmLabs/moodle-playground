@@ -378,6 +378,15 @@ export function parseQueryParams(urlOrSearchParams) {
     phpCorsProxyUrl: params.get("phpCorsProxyUrl") || null,
     debug: params.get("debug") || null,
     profile: params.get("profile") || null,
+    plugin: params.getAll("plugin"),
+    theme: params.get("theme") || null,
+    url: params.get("url") || null,
+    mode: params.get("mode") || null,
+    login: params.get("login") || null,
+    lazy: params.get("lazy") || null,
+    lang: params.get("lang") || params.get("language") || null,
+    importSite: params.get("import-site") || null,
+    moodlePr: params.get("moodle-pr") || null,
   };
 }
 

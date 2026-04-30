@@ -504,6 +504,14 @@ function bindShellCommands(scopeId, runtimeId) {
     ) {
       phpWorker?.postMessage({ kind: message.kind });
     }
+
+    if (message?.kind === "site-export") {
+      phpWorker?.postMessage({ kind: "site-export" });
+    }
+
+    if (message?.kind === "site-import") {
+      phpWorker?.postMessage({ kind: "site-import", data: message.data });
+    }
   });
 }
 

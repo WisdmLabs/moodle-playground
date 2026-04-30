@@ -73,6 +73,8 @@ const els = {
   resetStorageButton: document.querySelector("#reset-storage-button"),
   persistenceStatusRow: document.querySelector("#persistence-status-row"),
   persistenceStatus: document.querySelector("#persistence-status"),
+  exportSiteButton: document.querySelector("#export-site-button"),
+  importSiteInput: document.querySelector("#import-site-input"),
 };
 
 const scopeId = getOrCreateScopeId();
@@ -144,6 +146,7 @@ function setUiLocked(locked) {
   els.reset.disabled = locked;
   els.exportButton.disabled = locked;
   els.importInput.disabled = locked;
+  if (els.exportSiteButton) els.exportSiteButton.disabled = locked;
   els.addressForm.classList.toggle("is-disabled", locked);
 }
 
@@ -500,6 +503,23 @@ function bindShellChannel() {
       case "persistence-info":
         updatePersistenceStatus(message);
         break;
+      case "site-export-complete": {
+        const blob = new Blob([new Uint8Array(message.data)], {
+          type: "application/zip",
+        });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `moodle-playground-${Date.now()}.zip`;
+        link.click();
+        URL.revokeObjectURL(url);
+        appendLog("Site exported successfully.");
+        break;
+      }
+      case "site-import-complete":
+        appendLog("Site imported. Reloading...");
+        window.location.reload();
+        break;
       default:
         break;
     }
@@ -778,8 +798,42 @@ function filterGalleryCards(query) {
   }
 }
 
+function showLazySplash() {
+  const viewport = document.querySelector(".viewport");
+  if (!viewport) return;
+
+  const splash = document.createElement("div");
+  splash.className = "lazy-splash";
+
+  const title = document.createElement("h2");
+  title.textContent = "Moodle Playground";
+  splash.append(title);
+
+  const subtitle = document.createElement("p");
+  subtitle.textContent = "Click to start the Moodle runtime";
+  splash.append(subtitle);
+
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.textContent = "Launch Moodle";
+  btn.addEventListener("click", () => {
+    splash.remove();
+    void updateFrame();
+  });
+  splash.append(btn);
+
+  viewport.append(splash);
+}
+
 async function main() {
   config = await loadPlaygroundConfig();
+
+  // Display mode: seamless hides all chrome for embedding
+  const displayMode = new URLSearchParams(window.location.search).get("mode") || "browser-full-screen";
+  if (displayMode === "seamless") {
+    document.body.classList.add("is-seamless");
+  }
+
   activeBlueprint = await resolveBlueprint({
     scopeId,
     location: window.location,
@@ -865,7 +919,13 @@ async function main() {
   setPhpInfoContent("");
   phpInfoCapturePromise = null;
   setUiLocked(true);
-  await updateFrame();
+
+  const isLazy = new URLSearchParams(window.location.search).get("lazy") === "true";
+  if (isLazy) {
+    showLazySplash();
+  } else {
+    await updateFrame();
+  }
 }
 
 els.home.addEventListener("click", () => {
@@ -943,6 +1003,30 @@ if (els.resetStorageButton) {
     if (!confirm("Clear all saved data? This cannot be undone.")) return;
     appendLog("Clearing persistent storage...");
     postToRemote({ kind: "persistence-reset" });
+  });
+}
+
+if (els.exportSiteButton) {
+  els.exportSiteButton.addEventListener("click", () => {
+    if (uiLocked) return;
+    appendLog("Exporting site state...");
+    postToRemote({ kind: "site-export" });
+  });
+}
+
+if (els.importSiteInput) {
+  els.importSiteInput.addEventListener("change", async () => {
+    const file = els.importSiteInput.files?.[0];
+    if (!file) return;
+    try {
+      const buffer = await file.arrayBuffer();
+      appendLog("Importing site state...");
+      postToRemote({ kind: "site-import", data: buffer });
+    } catch (error) {
+      appendLog(`Import failed: ${error.message}`, true);
+    } finally {
+      els.importSiteInput.value = "";
+    }
   });
 }
 

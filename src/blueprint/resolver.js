@@ -1,3 +1,4 @@
+import { parseQueryParams } from "../shared/version-resolver.js";
 import { parseBlueprint } from "./parser.js";
 import { validateBlueprint } from "./schema.js";
 import { saveBlueprint } from "./storage.js";
@@ -8,9 +9,10 @@ import { saveBlueprint } from "./storage.js";
  * Precedence:
  *   1. ?blueprint= query param (inline JSON / base64 / data-URL)
  *   2. ?blueprint-url= query param (remote URL)
- *   3. sessionStorage
- *   4. defaultBlueprintUrl (fetch)
- *   5. Built-in minimal default
+ *   3. Query param shortcuts (?plugin=, ?theme=, ?url=, ?lang=)
+ *   4. sessionStorage
+ *   5. defaultBlueprintUrl (fetch)
+ *   6. Built-in minimal default
  *
  * @param {{ scopeId: string, location?: Location, defaultBlueprintUrl?: string }} options
  * @returns {Promise<object>} Resolved blueprint object.
@@ -52,7 +54,18 @@ export async function resolveBlueprint({
         if (!response.ok) {
           throw new Error(`HTTP ${response.status}`);
         }
-        const blueprint = await response.json();
+
+        let blueprint;
+        const contentType = response.headers.get("content-type") || "";
+        if (
+          blueprintUrlParam.endsWith(".zip") ||
+          contentType.includes("zip")
+        ) {
+          blueprint = await resolveBundleZip(response);
+        } else {
+          blueprint = await response.json();
+        }
+
         const validation = validateBlueprint(blueprint);
         if (!validation.valid) {
           throw new Error(`Invalid blueprint: ${validation.errors.join(", ")}`);
@@ -69,11 +82,22 @@ export async function resolveBlueprint({
     }
   }
 
-  // 3. sessionStorage blueprints are not reloaded on bare URL navigations —
+  // 3. Query param shortcuts (?plugin=, ?theme=, ?url=, ?lang=)
+  if (loc) {
+    const queryParams = parseQueryParams(loc);
+    const paramBlueprint = buildBlueprintFromParams(queryParams);
+    if (paramBlueprint) {
+      console.log("[blueprint] Resolved from query param shortcuts.");
+      saveBlueprint(scopeId, paramBlueprint);
+      return paramBlueprint;
+    }
+  }
+
+  // 4. sessionStorage blueprints are not reloaded on bare URL navigations —
   //    the ephemeral runtime should boot clean. Blueprints from ?blueprint=
   //    params are returned above before reaching this point.
 
-  // 4. defaultBlueprintUrl
+  // 5. defaultBlueprintUrl
   if (defaultBlueprintUrl) {
     try {
       const base = loc ? loc.href : undefined;
@@ -101,11 +125,34 @@ export async function resolveBlueprint({
     }
   }
 
-  // 5. Built-in minimal default
+  // 6. Built-in minimal default
   console.log("[blueprint] Using built-in default.");
   const fallback = buildMinimalDefault();
   saveBlueprint(scopeId, fallback);
   return fallback;
+}
+
+async function resolveBundleZip(response) {
+  const { unzipSync } = await import("fflate");
+  const buffer = await response.arrayBuffer();
+  const files = unzipSync(new Uint8Array(buffer));
+
+  const blueprintData = files["blueprint.json"];
+  if (!blueprintData) {
+    throw new Error("No blueprint.json found in bundle ZIP");
+  }
+
+  const blueprint = JSON.parse(new TextDecoder().decode(blueprintData));
+
+  // Store bundled files for use by steps
+  blueprint._bundledFiles = {};
+  for (const [path, data] of Object.entries(files)) {
+    if (path !== "blueprint.json") {
+      blueprint._bundledFiles[path] = data;
+    }
+  }
+
+  return blueprint;
 }
 
 function buildMinimalDefault() {
@@ -132,5 +179,59 @@ function buildMinimalDefault() {
       { step: "login", username: "admin" },
       { step: "setLandingPage", path: "/my/" },
     ],
+  };
+}
+
+/**
+ * Build a blueprint from query param shortcuts.
+ *
+ * Only triggers when at least one of plugin, theme, url, or lang is provided.
+ * This allows one-click install links like:
+ *   ?plugin=mod_board&theme=moove&lang=es
+ *
+ * @param {object} queryParams - Parsed query params from parseQueryParams().
+ * @returns {object|null} Blueprint object, or null if no shortcut params are present.
+ */
+export function buildBlueprintFromParams(queryParams) {
+  const hasPlugins = queryParams.plugin && queryParams.plugin.length > 0;
+  const hasTheme = !!queryParams.theme;
+  const hasLang = !!queryParams.lang;
+  const hasUrl = !!queryParams.url;
+
+  if (!hasPlugins && !hasTheme && !hasLang && !hasUrl) {
+    return null;
+  }
+
+  const steps = [{ step: "installMoodle" }];
+
+  if (queryParams.login !== "no") {
+    steps.push({ step: "login", username: "admin" });
+  }
+
+  if (hasPlugins) {
+    for (const pluginUrl of queryParams.plugin) {
+      steps.push({ step: "installPlugin", pluginUrl });
+    }
+  }
+
+  if (hasTheme) {
+    steps.push({ step: "setTheme", name: queryParams.theme });
+  }
+
+  if (hasLang) {
+    steps.push({ step: "setSiteLanguage", language: queryParams.lang });
+  }
+
+  if (hasUrl) {
+    steps.push({ step: "setLandingPage", path: queryParams.url });
+  }
+
+  return {
+    landingPage: queryParams.url || "/my/",
+    preferredVersions: {
+      php: queryParams.php || "8.3",
+      moodle: queryParams.moodle || "5.0",
+    },
+    steps,
   };
 }

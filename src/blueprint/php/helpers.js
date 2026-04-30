@@ -172,6 +172,13 @@ ${filesBlock}
 // Backward-compatible constant for callers that don't need files.
 const ADD_MODULE_EXEC = addModuleExec();
 
+export function phpSetSiteLanguage(lang) {
+  return `${CLI_HEADER}
+set_config('lang', '${escapePhp(lang)}');
+echo json_encode(['ok' => true, 'language' => '${escapePhp(lang)}']);
+`;
+}
+
 export function phpSetConfig(name, value, plugin = null) {
   const pluginArg = plugin ? `'${escapePhp(plugin)}'` : "null";
   return `${CLI_HEADER}
@@ -217,6 +224,7 @@ export function phpCreateUsers(users) {
     return `
 $u${i} = new stdClass();
 $u${i}->username = '${username}';
+// harness-ignore: no-hardcoded-credentials
 $u${i}->password = '${password}';
 $u${i}->email = '${email}';
 $u${i}->firstname = '${firstname}';

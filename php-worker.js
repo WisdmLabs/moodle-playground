@@ -894,6 +894,51 @@ function installMessageListener() {
       return;
     }
 
+    if (event.data?.kind === "site-export") {
+      if (runtimeStatePromise) {
+        runtimeStatePromise.then(async (state) => {
+          try {
+            const { collectSnapshot } = await import("./src/persistence/snapshot.js");
+            const { createPlaygroundZip } = await import("./src/persistence/export.js");
+            const snap = collectSnapshot(state.php, {
+              dbFilePath: buildDbPath(),
+              moodleBranch,
+              phpVersion,
+              webRoot: activeWebRoot,
+              activeBlueprint,
+            });
+            const zipData = createPlaygroundZip(snap);
+            postShell({ kind: "site-export-complete", data: Array.from(zipData) });
+          } catch (error) {
+            postShell({ kind: "error", detail: `Export failed: ${error.message}` });
+          }
+        });
+      } else {
+        postShell({ kind: "error", detail: "Export failed: runtime not ready." });
+      }
+      return;
+    }
+
+    if (event.data?.kind === "site-import") {
+      if (runtimeStatePromise) {
+        runtimeStatePromise.then(async (state) => {
+          try {
+            const { importPlaygroundZip } = await import("./src/persistence/import.js");
+            const meta = importPlaygroundZip(event.data.data, state.php, {
+              dbFilePath: buildDbPath(),
+              webRoot: activeWebRoot,
+            });
+            postShell({ kind: "site-import-complete", metadata: meta });
+          } catch (error) {
+            postShell({ kind: "error", detail: `Import failed: ${error.message}` });
+          }
+        });
+      } else {
+        postShell({ kind: "error", detail: "Import failed: runtime not ready." });
+      }
+      return;
+    }
+
     if (event.data?.kind !== "configure-blueprint") {
       if (event.data?.kind === "capture-phpinfo") {
         void publishPhpInfo(activeRuntimeConfig, "manual");
