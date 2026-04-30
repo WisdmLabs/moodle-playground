@@ -1,0 +1,116 @@
+{
+  "version": 1,
+  "categories": [
+    {
+      "name": "Getting Started",
+      "blueprints": [
+        {
+          "id": "minimal",
+          "title": "Minimal Moodle",
+          "description": "Clean install with dashboard only.",
+          "file": "examples/minimal.blueprint.json",
+          "icon": "rocket"
+        },
+        {
+          "id": "course-with-content",
+          "title": "Course with Content",
+          "description": "Single course with a label and assignment.",
+          "file": "examples/course-with-content.blueprint.json",
+          "icon": "book"
+        },
+        {
+          "id": "multi-user",
+          "title": "Multi-User Setup",
+          "description": "Multiple users with teacher and student roles.",
+          "file": "examples/multi-user.blueprint.json",
+          "icon": "users"
+        }
+      ]
+    },
+    {
+      "name": "Teaching",
+      "blueprints": [
+        {
+          "id": "classroom-ready",
+          "title": "Classroom Ready",
+          "description": "Teacher + 3 students with a 4-section English course.",
+          "file": "examples/classroom-ready.blueprint.json",
+          "icon": "chalkboard"
+        },
+        {
+          "id": "university-course",
+          "title": "University Course",
+          "description": "Full 8-week programming course with assignments, forums, and a final project.",
+          "file": "examples/university-course.blueprint.json",
+          "icon": "graduation-cap"
+        },
+        {
+          "id": "assignment-workflow",
+          "title": "Assignment Workflow",
+          "description": "Essay assignments, group projects, and peer review forums for grading demos.",
+          "file": "examples/assignment-workflow.blueprint.json",
+          "icon": "clipboard-check"
+        },
+        {
+          "id": "moodle-training",
+          "title": "Moodle Training",
+          "description": "Self-guided training course teaching Moodle basics to new teachers.",
+          "file": "examples/moodle-training.blueprint.json",
+          "icon": "life-ring"
+        },
+        {
+          "id": "forum-discussion",
+          "title": "Forum Discussion",
+          "description": "Discussion-focused course with introductions, debates, and Q&A forums.",
+          "file": "examples/forum-discussion.blueprint.json",
+          "icon": "comments"
+        }
+      ]
+    },
+    {
+      "name": "Administration",
+      "blueprints": [
+        {
+          "id": "multi-department",
+          "title": "Multi-Department",
+          "description": "3 departments, 6 courses, 2 teachers, and 10 students across the institution.",
+          "file": "examples/multi-department.blueprint.json",
+          "icon": "building"
+        },
+        {
+          "id": "plugin-testing",
+          "title": "Plugin Testing Environment",
+          "description": "Debug mode enabled with developer settings for testing plugins.",
+          "file": "examples/plugin-testing.blueprint.json",
+          "icon": "wrench"
+        }
+      ]
+    },
+    {
+      "name": "Plugins & Themes",
+      "blueprints": [
+        {
+          "id": "plugin-exeweb",
+          "title": "eXeLearning Plugin",
+          "description": "Demonstrates the exeweb activity module for embedding eXeLearning content.",
+          "file": "examples/plugin-exeweb.blueprint.json",
+          "icon": "puzzle-piece"
+        },
+        {
+          "id": "plugin-showcase",
+          "title": "Plugin Showcase",
+          "description": "Board plugin demo with a Kanban-style collaborative activity.",
+          "file": "examples/plugin-showcase.blueprint.json",
+          "icon": "plug"
+        },
+        {
+          "id": "visual-theme-moove",
+          "title": "Moove Theme",
+          "description": "Installs and activates the Moove theme with a sample course.",
+          "file": "examples/visual-theme-moove.blueprint.json",
+          "icon": "paint-brush"
+        }
+      ]
+    }
+  ]
+}

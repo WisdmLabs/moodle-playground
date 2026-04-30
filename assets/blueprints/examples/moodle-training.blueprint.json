@@ -1,0 +1,106 @@
+{
+  "$schema": "../blueprint-schema.json",
+  "landingPage": "/course/view.php?id=2",
+  "preferredVersions": { "php": "8.3", "moodle": "5.0" },
+  "constants": {
+    "ADMIN_USER": "admin",
+    "ADMIN_PASS": "password",
+    "ADMIN_EMAIL": "admin@example.com"
+  },
+  "steps": [
+    {
+      "step": "installMoodle",
+      "options": {
+        "adminUser": "{{ADMIN_USER}}",
+        "adminPass": "{{ADMIN_PASS}}",
+        "adminEmail": "{{ADMIN_EMAIL}}",
+        "siteName": "Moodle Training Hub"
+      }
+    },
+    {
+      "step": "login",
+      "username": "{{ADMIN_USER}}"
+    },
+    {
+      "step": "createCategory",
+      "name": "Training"
+    },
+    {
+      "step": "createCourse",
+      "fullname": "Moodle Basics for Teachers",
+      "shortname": "TRAIN101",
+      "category": "Training",
+      "numsections": 4,
+      "summary": "A self-guided training course for teachers new to Moodle. Learn how to create courses, add activities, manage students, and use the gradebook.",
+      "format": "topics"
+    },
+    {
+      "step": "addModule",
+      "module": "label",
+      "course": "TRAIN101",
+      "section": 1,
+      "name": "Course Creation",
+      "intro": "<h3>Module 1: Course Creation</h3><p>Learn the fundamentals of creating and configuring courses in Moodle.</p>"
+    },
+    {
+      "step": "addModule",
+      "module": "page",
+      "course": "TRAIN101",
+      "section": 1,
+      "name": "Guide: Creating Your First Course",
+      "intro": "This guide walks you through creating a new course in Moodle. Topics covered: navigating to Site Administration > Courses > Add a new course, setting the course full name and short name, choosing a course format (weekly, topics, social), configuring enrollment methods, and setting course start and end dates. Tip: Use the Topics format for self-paced courses and the Weekly format for scheduled courses."
+    },
+    {
+      "step": "addModule",
+      "module": "label",
+      "course": "TRAIN101",
+      "section": 2,
+      "name": "Adding Activities",
+      "intro": "<h3>Module 2: Adding Activities & Resources</h3><p>Discover the activity and resource types available in Moodle and when to use each one.</p>"
+    },
+    {
+      "step": "addModule",
+      "module": "page",
+      "course": "TRAIN101",
+      "section": 2,
+      "name": "Guide: Activities and Resources",
+      "intro": "Moodle offers many activity types. Key activities: Assignment (collect and grade student work), Forum (discussions and peer interaction), Quiz (auto-graded assessments), Workshop (peer assessment). Key resources: Page (inline content), File (downloadable documents), URL (external links), Label (section headings and descriptions), Folder (organized file collections), Book (multi-page content). To add an activity: turn on Edit mode, click 'Add an activity or resource' in the desired section, and configure the settings."
+    },
+    {
+      "step": "addModule",
+      "module": "label",
+      "course": "TRAIN101",
+      "section": 3,
+      "name": "Managing Students",
+      "intro": "<h3>Module 3: Managing Students</h3><p>Learn about enrollment methods, user roles, and group management.</p>"
+    },
+    {
+      "step": "addModule",
+      "module": "page",
+      "course": "TRAIN101",
+      "section": 3,
+      "name": "Guide: Enrollment and Groups",
+      "intro": "Student management in Moodle: Enrollment methods include manual enrollment (teacher adds students), self-enrollment (students enroll themselves with an optional key), and cohort sync (automatic enrollment from site-level groups). User roles: Manager, Course creator, Teacher (editingteacher), Non-editing teacher, Student, Guest. Groups: Create groups for team projects or differentiated instruction. Use Groupings to assign specific activities to specific groups. Access the Participants page from the course navigation to manage enrolled users."
+    },
+    {
+      "step": "addModule",
+      "module": "label",
+      "course": "TRAIN101",
+      "section": 4,
+      "name": "Assessment & Grades",
+      "intro": "<h3>Module 4: Assessment & Grades</h3><p>Master the gradebook and learn how to configure grading for your course.</p>"
+    },
+    {
+      "step": "addModule",
+      "module": "page",
+      "course": "TRAIN101",
+      "section": 4,
+      "name": "Guide: Grading and the Gradebook",
+      "intro": "The Moodle Gradebook automatically collects grades from all graded activities. Key concepts: Grade categories (organize grades into weighted groups), Grade calculations (weighted mean, simple weighted mean, natural), Grade letters (customize the A-F scale), Grading workflows (enable draft grades before releasing to students), Rubrics and Marking guides (create structured grading criteria for assignments). Access the gradebook from Course navigation > Grades. Set up your grade structure early in the course to avoid recalculation issues later."
+    },
+    {
+      "step": "setLandingPage",
+      "path": "/course/view.php?id=2"
+    }
+  ]
+}

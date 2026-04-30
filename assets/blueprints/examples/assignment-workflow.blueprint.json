@@ -1,0 +1,155 @@
+{
+  "$schema": "../blueprint-schema.json",
+  "landingPage": "/course/view.php?id=2",
+  "preferredVersions": { "php": "8.3", "moodle": "5.0" },
+  "constants": {
+    "ADMIN_USER": "admin",
+    "ADMIN_PASS": "password",
+    "ADMIN_EMAIL": "admin@example.com",
+    "TEACHER_USER": "teacher1",
+    "TEACHER_PASS": "Teacher1!",
+    "TEACHER_EMAIL": "teacher1@example.com"
+  },
+  "steps": [
+    {
+      "step": "installMoodle",
+      "options": {
+        "adminUser": "{{ADMIN_USER}}",
+        "adminPass": "{{ADMIN_PASS}}",
+        "adminEmail": "{{ADMIN_EMAIL}}",
+        "siteName": "Assignment Workflow Demo"
+      }
+    },
+    {
+      "step": "login",
+      "username": "{{ADMIN_USER}}"
+    },
+    {
+      "step": "createUsers",
+      "users": [
+        {
+          "username": "{{TEACHER_USER}}",
+          "password": "{{TEACHER_PASS}}",
+          "email": "{{TEACHER_EMAIL}}",
+          "firstname": "Maria",
+          "lastname": "Rodriguez"
+        },
+        {
+          "username": "student1",
+          "password": "Student1!",
+          "email": "student1@example.com",
+          "firstname": "Alice",
+          "lastname": "Johnson"
+        },
+        {
+          "username": "student2",
+          "password": "Student2!",
+          "email": "student2@example.com",
+          "firstname": "Bob",
+          "lastname": "Williams"
+        },
+        {
+          "username": "student3",
+          "password": "Student3!",
+          "email": "student3@example.com",
+          "firstname": "Carlos",
+          "lastname": "Garcia"
+        },
+        {
+          "username": "student4",
+          "password": "Student4!",
+          "email": "student4@example.com",
+          "firstname": "Diana",
+          "lastname": "Chen"
+        },
+        {
+          "username": "student5",
+          "password": "Student5!",
+          "email": "student5@example.com",
+          "firstname": "Erik",
+          "lastname": "Mueller"
+        }
+      ]
+    },
+    {
+      "step": "createCategory",
+      "name": "Assessment Demos"
+    },
+    {
+      "step": "createCourse",
+      "fullname": "Assignment Grading Demo",
+      "shortname": "ASSESS101",
+      "category": "Assessment Demos",
+      "numsections": 3,
+      "summary": "Explore Moodle's assignment and grading workflows. Includes essay submissions, group projects, and peer review forums.",
+      "format": "topics"
+    },
+    {
+      "step": "enrolUsers",
+      "enrolments": [
+        { "username": "{{TEACHER_USER}}", "course": "ASSESS101", "role": "editingteacher" },
+        { "username": "student1", "course": "ASSESS101", "role": "student" },
+        { "username": "student2", "course": "ASSESS101", "role": "student" },
+        { "username": "student3", "course": "ASSESS101", "role": "student" },
+        { "username": "student4", "course": "ASSESS101", "role": "student" },
+        { "username": "student5", "course": "ASSESS101", "role": "student" }
+      ]
+    },
+    {
+      "step": "addModule",
+      "module": "label",
+      "course": "ASSESS101",
+      "section": 1,
+      "name": "Essay Assignment",
+      "intro": "<h3>Section 1: Essay Assignment</h3><p>A traditional individual essay assignment. Students write and submit their work for teacher grading.</p>"
+    },
+    {
+      "step": "addModule",
+      "module": "assign",
+      "course": "ASSESS101",
+      "section": 1,
+      "name": "Reflective Essay",
+      "intro": "Write a 500-word reflective essay on a topic of your choice related to your field of study. Your essay should include an introduction, body paragraphs with supporting evidence, and a conclusion. Grading criteria: clarity of argument (30%), use of evidence (30%), structure and organization (20%), grammar and style (20%)."
+    },
+    {
+      "step": "addModule",
+      "module": "label",
+      "course": "ASSESS101",
+      "section": 2,
+      "name": "Group Project",
+      "intro": "<h3>Section 2: Group Project</h3><p>A collaborative group assignment. Teams work together to produce a shared deliverable.</p>"
+    },
+    {
+      "step": "addModule",
+      "module": "assign",
+      "course": "ASSESS101",
+      "section": 2,
+      "name": "Group Research Report",
+      "intro": "Working in teams of 2-3, research and present a report on an emerging technology. Your report should cover: background and history, current applications, future potential, and ethical considerations. Each team member must contribute equally. Submit one report per team (1000-1500 words)."
+    },
+    {
+      "step": "addModule",
+      "module": "label",
+      "course": "ASSESS101",
+      "section": 3,
+      "name": "Peer Review",
+      "intro": "<h3>Section 3: Peer Review</h3><p>Use the discussion forum to give and receive peer feedback on submitted work.</p>"
+    },
+    {
+      "step": "addModule",
+      "module": "forum",
+      "course": "ASSESS101",
+      "section": 3,
+      "name": "Peer Review Forum",
+      "intro": "Post a summary of your essay or project, then review and provide constructive feedback on at least two of your classmates' submissions. Use the following criteria: Is the argument clear? Is evidence well-used? What could be improved?"
+    },
+    {
+      "step": "login",
+      "username": "{{TEACHER_USER}}"
+    },
+    {
+      "step": "setLandingPage",
+      "path": "/course/view.php?id=2"
+    }
+  ]
+}

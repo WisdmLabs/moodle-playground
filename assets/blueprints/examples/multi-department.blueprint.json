@@ -1,0 +1,240 @@
+{
+  "$schema": "../blueprint-schema.json",
+  "landingPage": "/",
+  "preferredVersions": { "php": "8.3", "moodle": "5.0" },
+  "constants": {
+    "ADMIN_USER": "admin",
+    "ADMIN_PASS": "password",
+    "ADMIN_EMAIL": "admin@example.com"
+  },
+  "steps": [
+    {
+      "step": "installMoodle",
+      "options": {
+        "adminUser": "{{ADMIN_USER}}",
+        "adminPass": "{{ADMIN_PASS}}",
+        "adminEmail": "{{ADMIN_EMAIL}}",
+        "siteName": "Multi-Department University"
+      }
+    },
+    {
+      "step": "login",
+      "username": "{{ADMIN_USER}}"
+    },
+    {
+      "step": "createUsers",
+      "users": [
+        {
+          "username": "teacher_math",
+          "password": "Teacher1!",
+          "email": "teacher.math@example.com",
+          "firstname": "Alan",
+          "lastname": "Turing"
+        },
+        {
+          "username": "teacher_sci",
+          "password": "Teacher2!",
+          "email": "teacher.sci@example.com",
+          "firstname": "Marie",
+          "lastname": "Curie"
+        },
+        {
+          "username": "student1",
+          "password": "Student1!",
+          "email": "student1@example.com",
+          "firstname": "Alice",
+          "lastname": "Johnson"
+        },
+        {
+          "username": "student2",
+          "password": "Student2!",
+          "email": "student2@example.com",
+          "firstname": "Bob",
+          "lastname": "Williams"
+        },
+        {
+          "username": "student3",
+          "password": "Student3!",
+          "email": "student3@example.com",
+          "firstname": "Carlos",
+          "lastname": "Garcia"
+        },
+        {
+          "username": "student4",
+          "password": "Student4!",
+          "email": "student4@example.com",
+          "firstname": "Diana",
+          "lastname": "Chen"
+        },
+        {
+          "username": "student5",
+          "password": "Student5!",
+          "email": "student5@example.com",
+          "firstname": "Erik",
+          "lastname": "Mueller"
+        },
+        {
+          "username": "student6",
+          "password": "Student6!",
+          "email": "student6@example.com",
+          "firstname": "Fatima",
+          "lastname": "Ahmed"
+        },
+        {
+          "username": "student7",
+          "password": "Student7!",
+          "email": "student7@example.com",
+          "firstname": "George",
+          "lastname": "Brown"
+        },
+        {
+          "username": "student8",
+          "password": "Student8!",
+          "email": "student8@example.com",
+          "firstname": "Hannah",
+          "lastname": "Lee"
+        },
+        {
+          "username": "student9",
+          "password": "Student9!",
+          "email": "student9@example.com",
+          "firstname": "Ivan",
+          "lastname": "Petrov"
+        },
+        {
+          "username": "student10",
+          "password": "Student10!",
+          "email": "student10@example.com",
+          "firstname": "Julia",
+          "lastname": "Santos"
+        }
+      ]
+    },
+    {
+      "step": "createCategories",
+      "categories": [
+        { "name": "Mathematics" },
+        { "name": "Sciences" },
+        { "name": "Humanities" }
+      ]
+    },
+    {
+      "step": "createCourses",
+      "courses": [
+        {
+          "fullname": "Calculus I",
+          "shortname": "MATH101",
+          "category": "Mathematics",
+          "summary": "Introduction to differential and integral calculus."
+        },
+        {
+          "fullname": "Linear Algebra",
+          "shortname": "MATH201",
+          "category": "Mathematics",
+          "summary": "Vectors, matrices, and linear transformations."
+        },
+        {
+          "fullname": "General Physics",
+          "shortname": "SCI101",
+          "category": "Sciences",
+          "summary": "Mechanics, thermodynamics, and waves."
+        },
+        {
+          "fullname": "Introduction to Chemistry",
+          "shortname": "SCI102",
+          "category": "Sciences",
+          "summary": "Atoms, molecules, reactions, and stoichiometry."
+        },
+        {
+          "fullname": "World History",
+          "shortname": "HUM101",
+          "category": "Humanities",
+          "summary": "Major civilizations and events from antiquity to the modern era."
+        },
+        {
+          "fullname": "Introduction to Philosophy",
+          "shortname": "HUM102",
+          "category": "Humanities",
+          "summary": "Fundamental questions in ethics, epistemology, and metaphysics."
+        }
+      ]
+    },
+    {
+      "step": "enrolUsers",
+      "enrolments": [
+        { "username": "teacher_math", "course": "MATH101", "role": "editingteacher" },
+        { "username": "teacher_math", "course": "MATH201", "role": "editingteacher" },
+        { "username": "teacher_sci", "course": "SCI101", "role": "editingteacher" },
+        { "username": "teacher_sci", "course": "SCI102", "role": "editingteacher" },
+        { "username": "{{ADMIN_USER}}", "course": "HUM101", "role": "editingteacher" },
+        { "username": "{{ADMIN_USER}}", "course": "HUM102", "role": "editingteacher" },
+        { "username": "student1", "course": "MATH101", "role": "student" },
+        { "username": "student2", "course": "MATH101", "role": "student" },
+        { "username": "student3", "course": "MATH201", "role": "student" },
+        { "username": "student4", "course": "MATH201", "role": "student" },
+        { "username": "student5", "course": "SCI101", "role": "student" },
+        { "username": "student6", "course": "SCI101", "role": "student" },
+        { "username": "student7", "course": "SCI102", "role": "student" },
+        { "username": "student8", "course": "SCI102", "role": "student" },
+        { "username": "student9", "course": "HUM101", "role": "student" },
+        { "username": "student10", "course": "HUM101", "role": "student" },
+        { "username": "student1", "course": "HUM102", "role": "student" },
+        { "username": "student3", "course": "SCI101", "role": "student" },
+        { "username": "student5", "course": "MATH101", "role": "student" },
+        { "username": "student7", "course": "HUM102", "role": "student" }
+      ]
+    },
+    {
+      "step": "addModule",
+      "module": "label",
+      "course": "MATH101",
+      "section": 1,
+      "name": "Welcome",
+      "intro": "<h3>Welcome to Calculus I</h3><p>This course covers limits, derivatives, and integrals.</p>"
+    },
+    {
+      "step": "addModule",
+      "module": "label",
+      "course": "MATH201",
+      "section": 1,
+      "name": "Welcome",
+      "intro": "<h3>Welcome to Linear Algebra</h3><p>Explore the world of vectors and matrices.</p>"
+    },
+    {
+      "step": "addModule",
+      "module": "label",
+      "course": "SCI101",
+      "section": 1,
+      "name": "Welcome",
+      "intro": "<h3>Welcome to General Physics</h3><p>From Newton's laws to thermodynamics.</p>"
+    },
+    {
+      "step": "addModule",
+      "module": "label",
+      "course": "SCI102",
+      "section": 1,
+      "name": "Welcome",
+      "intro": "<h3>Welcome to Introduction to Chemistry</h3><p>Discover how matter behaves at the atomic level.</p>"
+    },
+    {
+      "step": "addModule",
+      "module": "label",
+      "course": "HUM101",
+      "section": 1,
+      "name": "Welcome",
+      "intro": "<h3>Welcome to World History</h3><p>A journey through the major events that shaped our world.</p>"
+    },
+    {
+      "step": "addModule",
+      "module": "label",
+      "course": "HUM102",
+      "section": 1,
+      "name": "Welcome",
+      "intro": "<h3>Welcome to Introduction to Philosophy</h3><p>Question everything: ethics, knowledge, and reality.</p>"
+    },
+    {
+      "step": "setLandingPage",
+      "path": "/"
+    }
+  ]
+}

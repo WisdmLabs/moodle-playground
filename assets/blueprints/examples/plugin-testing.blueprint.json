@@ -1,0 +1,62 @@
+{
+  "$schema": "../blueprint-schema.json",
+  "landingPage": "/admin/plugins.php",
+  "preferredVersions": { "php": "8.3", "moodle": "5.0" },
+  "constants": {
+    "ADMIN_USER": "admin",
+    "ADMIN_PASS": "password",
+    "ADMIN_EMAIL": "admin@example.com",
+    "PLUGIN_URL": ""
+  },
+  "steps": [
+    {
+      "step": "installMoodle",
+      "options": {
+        "adminUser": "{{ADMIN_USER}}",
+        "adminPass": "{{ADMIN_PASS}}",
+        "adminEmail": "{{ADMIN_EMAIL}}",
+        "siteName": "Plugin Testing Environment"
+      }
+    },
+    {
+      "step": "login",
+      "username": "{{ADMIN_USER}}"
+    },
+    {
+      "step": "setConfigs",
+      "values": [
+        { "name": "debug", "value": "32767" },
+        { "name": "debugdisplay", "value": "1" },
+        { "name": "themedesignermode", "value": "1" },
+        { "name": "debugstringids", "value": "1" },
+        { "name": "cachejs", "value": "0" },
+        { "name": "cachetemplates", "value": "0" },
+        { "name": "langstringcache", "value": "0" }
+      ]
+    },
+    {
+      "step": "createCategory",
+      "name": "Plugin Testing"
+    },
+    {
+      "step": "createCourse",
+      "fullname": "Plugin Test Course",
+      "shortname": "PLUGTEST",
+      "category": "Plugin Testing",
+      "numsections": 2,
+      "summary": "A minimal course for testing plugin functionality in context."
+    },
+    {
+      "step": "addModule",
+      "module": "label",
+      "course": "PLUGTEST",
+      "section": 1,
+      "name": "Test Section",
+      "intro": "<h3>Plugin Testing Area</h3><p>Use this section to add and test plugin activities.</p>"
+    },
+    {
+      "step": "setLandingPage",
+      "path": "/admin/plugins.php"
+    }
+  ]
+}

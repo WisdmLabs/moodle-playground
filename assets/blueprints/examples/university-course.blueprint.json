@@ -1,0 +1,235 @@
+{
+  "$schema": "../blueprint-schema.json",
+  "landingPage": "/course/view.php?id=2",
+  "preferredVersions": { "php": "8.3", "moodle": "5.0" },
+  "constants": {
+    "ADMIN_USER": "admin",
+    "ADMIN_PASS": "password",
+    "ADMIN_EMAIL": "admin@example.com",
+    "TEACHER_USER": "profsmith",
+    "TEACHER_PASS": "Teacher1!",
+    "TEACHER_EMAIL": "profsmith@example.com"
+  },
+  "steps": [
+    {
+      "step": "installMoodle",
+      "options": {
+        "adminUser": "{{ADMIN_USER}}",
+        "adminPass": "{{ADMIN_PASS}}",
+        "adminEmail": "{{ADMIN_EMAIL}}",
+        "siteName": "University Course Demo"
+      }
+    },
+    {
+      "step": "login",
+      "username": "{{ADMIN_USER}}"
+    },
+    {
+      "step": "createUsers",
+      "users": [
+        {
+          "username": "{{TEACHER_USER}}",
+          "password": "{{TEACHER_PASS}}",
+          "email": "{{TEACHER_EMAIL}}",
+          "firstname": "Sarah",
+          "lastname": "Smith"
+        },
+        {
+          "username": "student1",
+          "password": "Student1!",
+          "email": "student1@example.com",
+          "firstname": "Alice",
+          "lastname": "Johnson"
+        },
+        {
+          "username": "student2",
+          "password": "Student2!",
+          "email": "student2@example.com",
+          "firstname": "Bob",
+          "lastname": "Williams"
+        },
+        {
+          "username": "student3",
+          "password": "Student3!",
+          "email": "student3@example.com",
+          "firstname": "Carlos",
+          "lastname": "Garcia"
+        },
+        {
+          "username": "student4",
+          "password": "Student4!",
+          "email": "student4@example.com",
+          "firstname": "Diana",
+          "lastname": "Chen"
+        },
+        {
+          "username": "student5",
+          "password": "Student5!",
+          "email": "student5@example.com",
+          "firstname": "Erik",
+          "lastname": "Mueller"
+        }
+      ]
+    },
+    {
+      "step": "createCategory",
+      "name": "Computer Science"
+    },
+    {
+      "step": "createCourse",
+      "fullname": "Introduction to Programming",
+      "shortname": "CS101",
+      "category": "Computer Science",
+      "numsections": 8,
+      "summary": "A comprehensive introductory programming course covering fundamentals from variables to object-oriented design.",
+      "format": "weekly"
+    },
+    {
+      "step": "enrolUsers",
+      "enrolments": [
+        { "username": "{{TEACHER_USER}}", "course": "CS101", "role": "editingteacher" },
+        { "username": "student1", "course": "CS101", "role": "student" },
+        { "username": "student2", "course": "CS101", "role": "student" },
+        { "username": "student3", "course": "CS101", "role": "student" },
+        { "username": "student4", "course": "CS101", "role": "student" },
+        { "username": "student5", "course": "CS101", "role": "student" }
+      ]
+    },
+    {
+      "step": "addModule",
+      "module": "label",
+      "course": "CS101",
+      "section": 1,
+      "name": "Getting Started",
+      "intro": "<h3>Week 1: Getting Started</h3><p>Welcome to Introduction to Programming! This week we set up our development environment and write our first program.</p>"
+    },
+    {
+      "step": "addModule",
+      "module": "page",
+      "course": "CS101",
+      "section": 1,
+      "name": "Course Overview",
+      "intro": "Read the full course overview including objectives, schedule, and assessment criteria. This course takes you from zero programming experience to building your own applications."
+    },
+    {
+      "step": "addModule",
+      "module": "label",
+      "course": "CS101",
+      "section": 2,
+      "name": "Variables & Data Types",
+      "intro": "<h3>Week 2: Variables & Data Types</h3><p>Learn about integers, strings, floats, and booleans. Understand how computers store and manipulate data.</p>"
+    },
+    {
+      "step": "addModule",
+      "module": "assign",
+      "course": "CS101",
+      "section": 2,
+      "name": "Coding Exercise: Variables",
+      "intro": "Write a program that declares variables of different types (integer, float, string, boolean) and performs basic operations with them. Submit your source code file."
+    },
+    {
+      "step": "addModule",
+      "module": "label",
+      "course": "CS101",
+      "section": 3,
+      "name": "Control Flow",
+      "intro": "<h3>Week 3: Control Flow</h3><p>Master if/else statements, loops (for, while), and switch/case structures to control program execution.</p>"
+    },
+    {
+      "step": "addModule",
+      "module": "assign",
+      "course": "CS101",
+      "section": 3,
+      "name": "Coding Exercise: Control Flow",
+      "intro": "Write a program that uses conditional statements and loops to solve a series of problems. Include at least one for loop, one while loop, and nested if/else logic."
+    },
+    {
+      "step": "addModule",
+      "module": "label",
+      "course": "CS101",
+      "section": 4,
+      "name": "Functions",
+      "intro": "<h3>Week 4: Functions</h3><p>Learn to write reusable code with functions. Understand parameters, return values, and scope.</p>"
+    },
+    {
+      "step": "addModule",
+      "module": "forum",
+      "course": "CS101",
+      "section": 4,
+      "name": "Discussion: Code Reusability",
+      "intro": "Share your thoughts: Why are functions important in programming? Give an example from your own experience where breaking code into functions made it easier to understand or maintain."
+    },
+    {
+      "step": "addModule",
+      "module": "label",
+      "course": "CS101",
+      "section": 5,
+      "name": "Arrays & Lists",
+      "intro": "<h3>Week 5: Arrays & Lists</h3><p>Work with collections of data. Learn about arrays, lists, and common operations like sorting and searching.</p>"
+    },
+    {
+      "step": "addModule",
+      "module": "assign",
+      "course": "CS101",
+      "section": 5,
+      "name": "Coding Exercise: Arrays",
+      "intro": "Write a program that creates an array of at least 10 elements, sorts them, searches for a specific value, and calculates the average. Submit your source code."
+    },
+    {
+      "step": "addModule",
+      "module": "label",
+      "course": "CS101",
+      "section": 6,
+      "name": "Object-Oriented Programming",
+      "intro": "<h3>Week 6: Object-Oriented Programming</h3><p>Introduction to classes, objects, inheritance, and encapsulation. Design your own data structures.</p>"
+    },
+    {
+      "step": "addModule",
+      "module": "assign",
+      "course": "CS101",
+      "section": 6,
+      "name": "Coding Exercise: OOP Basics",
+      "intro": "Design a class hierarchy for a simple library system. Create classes for Book, Member, and Library with appropriate attributes, methods, and relationships. Submit your source code."
+    },
+    {
+      "step": "addModule",
+      "module": "label",
+      "course": "CS101",
+      "section": 7,
+      "name": "Project Work",
+      "intro": "<h3>Week 7: Project Work</h3><p>Apply everything you have learned to build a complete application. Work independently or in pairs.</p>"
+    },
+    {
+      "step": "addModule",
+      "module": "assign",
+      "course": "CS101",
+      "section": 7,
+      "name": "Final Project",
+      "intro": "Build a complete application of your choice that demonstrates variables, control flow, functions, arrays, and at least one class. Include a README explaining your design decisions. This is worth 40% of your final grade."
+    },
+    {
+      "step": "addModule",
+      "module": "label",
+      "course": "CS101",
+      "section": 8,
+      "name": "Course Review",
+      "intro": "<h3>Week 8: Course Review</h3><p>Review key concepts, ask questions, and prepare for the final assessment.</p>"
+    },
+    {
+      "step": "addModule",
+      "module": "forum",
+      "course": "CS101",
+      "section": 8,
+      "name": "Course Feedback & Questions",
+      "intro": "Use this forum to ask any remaining questions about the course material, share resources you found helpful, or provide feedback on the course."
+    },
+    {
+      "step": "login",
+      "username": "{{TEACHER_USER}}"
+    },
+    {
+      "step": "setLandingPage",
+      "path": "/course/view.php?id=2"
+    }
+  ]
+}

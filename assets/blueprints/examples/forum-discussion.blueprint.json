@@ -1,0 +1,155 @@
+{
+  "$schema": "../blueprint-schema.json",
+  "landingPage": "/course/view.php?id=2",
+  "preferredVersions": { "php": "8.3", "moodle": "5.0" },
+  "constants": {
+    "ADMIN_USER": "admin",
+    "ADMIN_PASS": "password",
+    "ADMIN_EMAIL": "admin@example.com",
+    "TEACHER_USER": "teacher1",
+    "TEACHER_PASS": "Teacher1!",
+    "TEACHER_EMAIL": "teacher1@example.com"
+  },
+  "steps": [
+    {
+      "step": "installMoodle",
+      "options": {
+        "adminUser": "{{ADMIN_USER}}",
+        "adminPass": "{{ADMIN_PASS}}",
+        "adminEmail": "{{ADMIN_EMAIL}}",
+        "siteName": "Discussion Forum Demo"
+      }
+    },
+    {
+      "step": "login",
+      "username": "{{ADMIN_USER}}"
+    },
+    {
+      "step": "createUsers",
+      "users": [
+        {
+          "username": "{{TEACHER_USER}}",
+          "password": "{{TEACHER_PASS}}",
+          "email": "{{TEACHER_EMAIL}}",
+          "firstname": "James",
+          "lastname": "Wilson"
+        },
+        {
+          "username": "student1",
+          "password": "Student1!",
+          "email": "student1@example.com",
+          "firstname": "Alice",
+          "lastname": "Johnson"
+        },
+        {
+          "username": "student2",
+          "password": "Student2!",
+          "email": "student2@example.com",
+          "firstname": "Bob",
+          "lastname": "Williams"
+        },
+        {
+          "username": "student3",
+          "password": "Student3!",
+          "email": "student3@example.com",
+          "firstname": "Carlos",
+          "lastname": "Garcia"
+        },
+        {
+          "username": "student4",
+          "password": "Student4!",
+          "email": "student4@example.com",
+          "firstname": "Diana",
+          "lastname": "Chen"
+        },
+        {
+          "username": "student5",
+          "password": "Student5!",
+          "email": "student5@example.com",
+          "firstname": "Erik",
+          "lastname": "Mueller"
+        }
+      ]
+    },
+    {
+      "step": "createCategory",
+      "name": "Social Learning"
+    },
+    {
+      "step": "createCourse",
+      "fullname": "Discussion Forum Demo",
+      "shortname": "FORUM101",
+      "category": "Social Learning",
+      "numsections": 3,
+      "summary": "Explore Moodle's forum capabilities for collaborative discussions, debates, and Q&A sessions.",
+      "format": "topics"
+    },
+    {
+      "step": "enrolUsers",
+      "enrolments": [
+        { "username": "{{TEACHER_USER}}", "course": "FORUM101", "role": "editingteacher" },
+        { "username": "student1", "course": "FORUM101", "role": "student" },
+        { "username": "student2", "course": "FORUM101", "role": "student" },
+        { "username": "student3", "course": "FORUM101", "role": "student" },
+        { "username": "student4", "course": "FORUM101", "role": "student" },
+        { "username": "student5", "course": "FORUM101", "role": "student" }
+      ]
+    },
+    {
+      "step": "addModule",
+      "module": "label",
+      "course": "FORUM101",
+      "section": 1,
+      "name": "Introductions",
+      "intro": "<h3>Section 1: Introductions</h3><p>Get to know your classmates! Share a bit about yourself and your interests.</p>"
+    },
+    {
+      "step": "addModule",
+      "module": "forum",
+      "course": "FORUM101",
+      "section": 1,
+      "name": "Introduce Yourself",
+      "intro": "Welcome to the course! Please create a new post introducing yourself. Share your name, background, what you hope to learn, and one interesting fact about yourself. Then reply to at least two classmates' introductions."
+    },
+    {
+      "step": "addModule",
+      "module": "label",
+      "course": "FORUM101",
+      "section": 2,
+      "name": "Topic Debate",
+      "intro": "<h3>Section 2: Topic Debate</h3><p>Engage in structured debate on a thought-provoking topic. Practice making evidence-based arguments.</p>"
+    },
+    {
+      "step": "addModule",
+      "module": "forum",
+      "course": "FORUM101",
+      "section": 2,
+      "name": "Debate: Technology in Education",
+      "intro": "Debate topic: Does technology improve or hinder learning in the classroom? Take a position (for or against) and support your argument with evidence and examples. Respond respectfully to opposing viewpoints. Guidelines: Start with a clear thesis statement, provide at least two supporting points, and engage with at least one counterargument."
+    },
+    {
+      "step": "addModule",
+      "module": "label",
+      "course": "FORUM101",
+      "section": 3,
+      "name": "Q&A Session",
+      "intro": "<h3>Section 3: Q&A Session</h3><p>Ask questions and share answers with the class. This forum uses a Q&A format where you must post your own response before seeing others.</p>"
+    },
+    {
+      "step": "addModule",
+      "module": "forum",
+      "course": "FORUM101",
+      "section": 3,
+      "name": "Q&A: Course Topics Review",
+      "intro": "This is a Q&A forum. Post a question about any topic covered in the course, then answer at least one question posted by a classmate. You must submit your own answer before you can see other responses. This encourages independent thinking before collaborative learning."
+    },
+    {
+      "step": "login",
+      "username": "{{TEACHER_USER}}"
+    },
+    {
+      "step": "setLandingPage",
+      "path": "/course/view.php?id=2"
+    }
+  ]
+}
