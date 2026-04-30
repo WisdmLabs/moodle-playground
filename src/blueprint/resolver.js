@@ -131,6 +131,17 @@ export async function resolveBlueprint({
     }
   }
 
+  // 4b. ?moodle-pr= (apply a Moodle core PR patch)
+  if (loc) {
+    const moodlePr = new URL(loc.href).searchParams.get("moodle-pr");
+    if (moodlePr) {
+      console.log(`[blueprint] Generating blueprint for Moodle PR #${moodlePr}.`);
+      const prBlueprint = buildPrBlueprint(moodlePr, parseQueryParams(loc));
+      saveBlueprint(scopeId, prBlueprint);
+      return prBlueprint;
+    }
+  }
+
   // 5. ?import-site= (deferred - handled by worker after runtime boot)
   if (loc) {
     const importSiteUrl = new URL(loc.href).searchParams.get("import-site");
@@ -232,6 +243,36 @@ function buildMinimalDefault() {
       },
       { step: "login", username: "admin" },
       { step: "setLandingPage", path: "/my/" },
+    ],
+  };
+}
+
+/**
+ * Build a blueprint for testing a Moodle core pull request.
+ *
+ * Generates a blueprint with an `applyPatch` step that references the PR's diff URL.
+ * The patch application is currently a stub — full runtime patch support is planned.
+ *
+ * @param {string} prNumber - The Moodle core PR number.
+ * @param {object} queryParams - Parsed query params (for php/moodle version overrides).
+ * @returns {object} Blueprint object.
+ */
+function buildPrBlueprint(prNumber, queryParams) {
+  const patchUrl = `https://github.com/moodle/moodle/pull/${encodeURIComponent(prNumber)}.diff`;
+  return {
+    landingPage: queryParams.url || "/",
+    preferredVersions: {
+      php: queryParams.php || "8.3",
+      moodle: queryParams.moodle || "dev",
+    },
+    steps: [
+      { step: "installMoodle" },
+      {
+        step: "applyPatch",
+        patchUrl,
+        description: `Apply Moodle PR #${prNumber}`,
+      },
+      { step: "login", username: "admin" },
     ],
   };
 }

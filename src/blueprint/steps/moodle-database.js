@@ -11,6 +11,7 @@ export function registerMoodleDatabaseSteps(register) {
   register("runSql", handleRunSql);
   register("runSqlFile", handleRunSqlFile);
   register("resetData", handleResetData);
+  register("applyPatch", handleApplyPatch);
 }
 
 async function handleRunSql(step, { php }) {
@@ -42,6 +43,15 @@ foreach ($statements as $stmt) {
 echo json_encode(['ok' => true]);
 `;
   await php.run(code);
+}
+
+async function handleApplyPatch(step, _context) {
+  const url = step.patchUrl || step.url;
+  console.warn(
+    `[blueprint] applyPatch: Patch application from ${url} is not yet implemented. ` +
+      `The Moodle core is extracted from a prebuilt ZIP bundle, and applying git patches ` +
+      `at runtime requires a diff-apply mechanism that is planned for a future release.`,
+  );
 }
 
 async function handleResetData(step, { php }) {

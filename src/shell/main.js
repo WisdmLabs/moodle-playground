@@ -81,6 +81,9 @@ const els = {
   shareUrlInput: document.querySelector("#share-url-input"),
   shareCopyButton: document.querySelector("#share-copy-button"),
   shareCloseButton: document.querySelector("#share-close-button"),
+  githubTokenInput: document.querySelector("#github-token-input"),
+  githubGistButton: document.querySelector("#github-gist-button"),
+  githubGistResult: document.querySelector("#github-gist-result"),
 };
 
 const scopeId = getOrCreateScopeId();
@@ -989,6 +992,51 @@ async function main() {
   // Update share URL when radio selection changes
   for (const radio of document.querySelectorAll('input[name="share-type"]')) {
     radio.addEventListener("change", updateShareUrl);
+  }
+
+  // GitHub Gist export
+  if (els.githubGistButton) {
+    els.githubGistButton.addEventListener("click", async () => {
+      const token = els.githubTokenInput?.value?.trim();
+      if (!token) {
+        appendLog("GitHub token is required for Gist export.", true);
+        return;
+      }
+      if (!activeBlueprint) {
+        appendLog("No active blueprint to export.", true);
+        return;
+      }
+      try {
+        els.githubGistButton.disabled = true;
+        els.githubGistButton.textContent = "Creating...";
+        const { exportBlueprintAsGist, buildGistPlaygroundUrl } = await import("./github-export.js");
+        const gist = await exportBlueprintAsGist(activeBlueprint, token);
+        const playgroundUrl = buildGistPlaygroundUrl(gist.rawUrl, window.location.origin + window.location.pathname);
+        if (els.githubGistResult) {
+          els.githubGistResult.hidden = false;
+          els.githubGistResult.textContent = "";
+          const link = document.createElement("a");
+          link.href = gist.url;
+          link.target = "_blank";
+          link.rel = "noreferrer";
+          link.textContent = "View Gist";
+          els.githubGistResult.append(link);
+          const span = document.createElement("span");
+          span.textContent = " | ";
+          els.githubGistResult.append(span);
+          const playLink = document.createElement("a");
+          playLink.href = playgroundUrl;
+          playLink.textContent = "Launch from Gist";
+          els.githubGistResult.append(playLink);
+        }
+        appendLog(`Blueprint exported to Gist: ${gist.url}`);
+      } catch (error) {
+        appendLog(`Gist export failed: ${error.message}`, true);
+      } finally {
+        els.githubGistButton.disabled = false;
+        els.githubGistButton.textContent = "Create Gist";
+      }
+    });
   }
 
   bindShellChannel();

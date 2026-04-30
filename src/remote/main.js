@@ -467,13 +467,60 @@ function bindFrameNavigation(scopeId, runtimeId) {
   });
 }
 
+async function handleClientMessage(message, scopeId, runtimeId) {
+  const { type, id } = message;
+
+  function reply(result) {
+    window.parent.postMessage(
+      { source: "moodle-playground-host", id, result },
+      "*",
+    );
+  }
+
+  function replyError(error) {
+    window.parent.postMessage(
+      { source: "moodle-playground-host", id, error: String(error) },
+      "*",
+    );
+  }
+
+  try {
+    switch (type) {
+      case "navigate":
+        navigateFrame(scopeId, runtimeId, message.path || "/");
+        reply({ ok: true });
+        break;
+      case "run-php":
+      case "list-files":
+      case "read-file":
+      case "write-file":
+      case "export-site":
+      case "import-site":
+        // Forward to worker
+        phpWorker?.postMessage({ kind: type, ...message, source: undefined });
+        reply({ ok: true, forwarded: true });
+        break;
+      default:
+        replyError(`Unknown client message type: ${type}`);
+    }
+  } catch (error) {
+    replyError(error.message || String(error));
+  }
+}
+
 function bindShellCommands(scopeId, runtimeId) {
   window.addEventListener("message", (event) => {
-    if (event.origin !== window.location.origin) {
+    const message = event.data;
+
+    // Client API bridge
+    if (message?.source === "moodle-playground-client") {
+      handleClientMessage(message, scopeId, runtimeId);
       return;
     }
 
-    const message = event.data;
+    if (event.origin !== window.location.origin) {
+      return;
+    }
     if (message?.kind === "navigate-site") {
       navigateFrame(scopeId, runtimeId, message.path || "/");
       return;
@@ -652,6 +699,11 @@ async function bootstrapRemote() {
     }
     if (msg?.kind === "ready") {
       setRemoteProgress(msg.detail, 1);
+      // Notify the parent window (client API) that the playground is ready.
+      window.parent.postMessage(
+        { source: "moodle-playground-host", type: "ready" },
+        "*",
+      );
       // If bootstrap returns a readyPath (e.g. "/my/" after auto-login),
       // override the stale path from the URL so we don't navigate to
       // a previous session's install.php or other outdated path.

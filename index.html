@@ -317,6 +317,16 @@
           <input type="radio" name="share-type" value="params"> Query parameters
         </label>
       </div>
+      <div class="share-popover__divider"></div>
+      <div class="share-popover__github">
+        <label for="github-token-input">GitHub Gist Export</label>
+        <p class="share-popover__hint">Create a Gist with your blueprint for easy sharing. Requires a <a href="https://github.com/settings/tokens/new?scopes=gist&description=Moodle+Playground" target="_blank" rel="noreferrer">GitHub token</a> with gist scope.</p>
+        <div class="share-popover__url-row">
+          <input type="password" id="github-token-input" placeholder="GitHub token (ghp_...)">
+          <button type="button" id="github-gist-button">Create Gist</button>
+        </div>
+        <div id="github-gist-result" class="share-popover__result" hidden></div>
+      </div>
       <div class="share-popover__actions">
         <button type="button" id="share-close-button">Close</button>
       </div>

@@ -1,0 +1,14 @@
+{
+  "name": "@moodle-playground/client",
+  "version": "0.1.0",
+  "description": "Embed and control Moodle Playground instances programmatically",
+  "type": "module",
+  "main": "src/index.js",
+  "module": "src/index.js",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "files": ["src/", "README.md"],
+  "keywords": ["moodle", "playground", "wasm", "lms", "embed"],
+  "license": "MIT"
+}
