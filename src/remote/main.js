@@ -490,6 +490,15 @@ function bindShellCommands(scopeId, runtimeId) {
         scopeId,
         runtimeId,
       });
+      return;
+    }
+
+    if (
+      message?.kind === "persistence-save" ||
+      message?.kind === "persistence-reset" ||
+      message?.kind === "persistence-info"
+    ) {
+      phpWorker?.postMessage({ kind: message.kind });
     }
   });
 }

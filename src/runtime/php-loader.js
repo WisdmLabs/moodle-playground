@@ -86,7 +86,7 @@ export const __testing = {
  */
 export function createPhpRuntime(
   _runtime,
-  { appBaseUrl, phpVersion, webRoot, corsProxyUrl, phpCorsProxyUrl } = {},
+  { appBaseUrl, phpVersion, webRoot, corsProxyUrl, phpCorsProxyUrl, syncFs: syncFsOption } = {},
 ) {
   const resolvedPhpVersion = phpVersion || DEFAULT_PHP_VERSION;
   const resolvedCorsProxyUrl = resolveCorsProxyUrl(
@@ -162,7 +162,7 @@ export function createPhpRuntime(
         /\/$/u,
         "",
       );
-      wrapped = wrapPhpInstance(php, { syncFs: null, absoluteUrl, webRoot });
+      wrapped = wrapPhpInstance(php, { syncFs: syncFsOption || null, absoluteUrl, webRoot });
 
       // Copy all methods from the wrapped instance onto this deferred object
       for (const key of Object.keys(wrapped)) {

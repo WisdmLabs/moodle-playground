@@ -3,6 +3,7 @@ import { createPhpBridgeChannel, createShellChannel } from "./src/shared/protoco
 import { bootstrapMoodle } from "./src/runtime/bootstrap.js";
 import { isFatalWasmError, isEmscriptenNetworkError, isSafeToReplay, formatErrorDetail, createSnapshotManager } from "./src/runtime/crash-recovery.js";
 import { createPhpRuntime, createProvisioningRuntime } from "./src/runtime/php-loader.js";
+import { createPersistenceStore, createSyncCallback } from "./src/persistence/index.js";
 import {
   getBranchMetadata,
   resolveRuntimeConfig,
@@ -39,6 +40,8 @@ let activeRuntimeConfig = null;
 let activeWebRoot = "/www/moodle";
 let phpInfoCapturePromise = null;
 let automaticPhpInfoAttempted = false;
+let persistenceStore = null;
+let persistenceBackend = "none";
 
 // --- Runtime rotation state ---
 // The PHP WASM runtime can crash with "memory access out of bounds",
@@ -491,10 +494,34 @@ async function getRuntimeState() {
       "resolved",
       `runtimeId=${runtimeId} php=${phpVersion} moodleBranch=${moodleBranch} runtimeConfig=${runtime.id}`,
     );
+    // Initialize persistence store (OPFS with IndexedDB fallback)
+    if (!persistenceStore) {
+      try {
+        const result = await createPersistenceStore(scopeId, moodleBranch);
+        persistenceStore = result.store;
+        persistenceBackend = result.backend;
+        postShell({
+          kind: "trace",
+          detail: `[persistence] initialized with backend: ${persistenceBackend}`,
+        });
+      } catch (persistErr) {
+        postShell({
+          kind: "trace",
+          detail: `[persistence] init failed: ${persistErr.message}, continuing without persistence`,
+        });
+      }
+    }
+
+    const dbPath = buildDbPath();
+    const { syncFs: syncFsCallback, setPhp: setSyncPhp } = persistenceStore
+      ? createSyncCallback(persistenceStore, dbPath, { postShell })
+      : { syncFs: null, setPhp: () => {} };
+
     const php = createPhpRuntime(activeRuntimeConfig, {
       appBaseUrl: appRootUrl,
       phpVersion,
       webRoot,
+      syncFs: syncFsCallback,
     });
 
     postShell({
@@ -507,6 +534,9 @@ async function getRuntimeState() {
     const t1 = performance.now();
     await php.refresh();
     const refreshMs = Math.round(performance.now() - t1);
+
+    // Provide the live PHP reference to the sync callback
+    setSyncPhp(php);
 
     postShell({
       kind: "progress",
@@ -541,7 +571,14 @@ async function getRuntimeState() {
         moodleBranch,
         profile,
         webRoot,
-        onPluginInstalled: (dirPath) => snapshot.trackPluginDir(dirPath),
+        onPluginInstalled: (dirPath) => {
+          snapshot.trackPluginDir(dirPath);
+          // Persist newly installed plugin directory to OPFS
+          if (persistenceStore) {
+            persistenceStore.saveDirectory(php, dirPath).catch(() => {});
+          }
+        },
+        persistenceStore,
       });
     } catch (error) {
       if (!automaticPhpInfoAttempted) {
@@ -742,6 +779,58 @@ function installBridgeListener() {
 
 function installMessageListener() {
   self.addEventListener("message", (event) => {
+    if (event.data?.kind === "persistence-save") {
+      if (persistenceStore && runtimeStatePromise) {
+        runtimeStatePromise.then(async (state) => {
+          try {
+            const rawPhp = state.php._php;
+            const dbData = rawPhp.readFileAsBuffer(buildDbPath());
+            if (dbData && dbData.byteLength > 0) {
+              await persistenceStore.saveFile(buildDbPath(), new Uint8Array(dbData));
+            }
+            const FILEDIR_PATH = "/persist/moodledata/filedir";
+            if (rawPhp.fileExists(FILEDIR_PATH) && rawPhp.isDir(FILEDIR_PATH)) {
+              await persistenceStore.saveDirectory(state.php, FILEDIR_PATH);
+            }
+            postShell({ kind: "persistence-saved", detail: "State saved to persistent storage." });
+          } catch (err) {
+            postShell({ kind: "error", detail: `[persistence] save failed: ${err.message}` });
+          }
+        });
+      }
+      return;
+    }
+
+    if (event.data?.kind === "persistence-reset") {
+      if (persistenceStore) {
+        persistenceStore.clear().then(() => {
+          postShell({ kind: "persistence-reset", detail: "Persistent storage cleared." });
+        }).catch((err) => {
+          postShell({ kind: "error", detail: `[persistence] reset failed: ${err.message}` });
+        });
+      }
+      return;
+    }
+
+    if (event.data?.kind === "persistence-info") {
+      if (persistenceStore) {
+        persistenceStore.getMetadata().then((meta) => {
+          postShell({
+            kind: "persistence-info",
+            backend: persistenceBackend,
+            totalSize: meta.totalSize,
+            fileCount: meta.fileCount,
+            lastModified: meta.lastModified,
+          });
+        }).catch(() => {
+          postShell({ kind: "persistence-info", backend: persistenceBackend, totalSize: 0, fileCount: 0, lastModified: 0 });
+        });
+      } else {
+        postShell({ kind: "persistence-info", backend: "none", totalSize: 0, fileCount: 0, lastModified: 0 });
+      }
+      return;
+    }
+
     if (event.data?.kind !== "configure-blueprint") {
       if (event.data?.kind === "capture-phpinfo") {
         void publishPhpInfo(activeRuntimeConfig, "manual");

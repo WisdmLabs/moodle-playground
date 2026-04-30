@@ -339,7 +339,11 @@ export function wrapPhpInstance(
      * Run inline PHP code. Returns a PHPResponse with .text and .errors.
      */
     async run(code) {
-      return php.run({ code });
+      const result = await php.run({ code });
+      if (syncFs) {
+        await syncFs();
+      }
+      return result;
     },
 
     /**

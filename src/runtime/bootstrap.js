@@ -1987,6 +1987,7 @@ export async function bootstrapMoodle({
   moodleBranch,
   webRoot: webRootParam,
   onPluginInstalled,
+  persistenceStore,
 }) {
   const selection = resolveRuntimeSelection({ runtimeId, moodleBranch });
   const resolvedRuntimeId = selection.runtimeId;
@@ -2217,6 +2218,72 @@ export async function bootstrapMoodle({
     0.869,
   );
 
+  // Restore persisted state from OPFS/IndexedDB if available.
+  // If we find a DB file in the persistence store, write it to MEMFS and
+  // skip the install snapshot download entirely.
+  let restoredFromPersistence = false;
+  if (persistenceStore) {
+    try {
+      const persistedDb = await persistenceStore.loadFile(dbFile);
+      if (persistedDb && persistedDb.byteLength > 100) {
+        publish("Restoring database from persistent storage.", 0.87);
+        await php.writeFile(dbFile, persistedDb);
+
+        // Restore filedir (user uploads)
+        const filedirCount = await persistenceStore.loadDirectory(
+          php,
+          "/persist/moodledata/filedir",
+        );
+        if (filedirCount > 0) {
+          publish(
+            `Restored ${filedirCount} files from persistent storage.`,
+            0.875,
+          );
+        }
+
+        // Restore plugin directories
+        const pluginPaths = await persistenceStore.listFiles(
+          `${webRoot}/`,
+        );
+        if (pluginPaths.length > 0) {
+          let pluginFileCount = 0;
+          for (const filePath of pluginPaths) {
+            const data = await persistenceStore.loadFile(filePath);
+            if (!data) continue;
+            const parentDir = filePath.substring(
+              0,
+              filePath.lastIndexOf("/"),
+            );
+            try {
+              php._php.mkdirTree(parentDir);
+            } catch {
+              /* exists */
+            }
+            php._php.writeFile(filePath, data);
+            pluginFileCount += 1;
+          }
+          if (pluginFileCount > 0) {
+            publish(
+              `Restored ${pluginFileCount} plugin files from persistent storage.`,
+              0.878,
+            );
+          }
+        }
+
+        restoredFromPersistence = true;
+        publish(
+          `Database restored from persistent storage (${persistedDb.byteLength} bytes).`,
+          0.88,
+        );
+      }
+    } catch (restoreErr) {
+      publish(
+        `Persistent storage restore failed: ${restoreErr.message}. Proceeding with fresh install.`,
+        0.87,
+      );
+    }
+  }
+
   let installState = null;
   const hasSavedInstallState = Boolean(savedInstallState?.installed);
   let installMarkerMatches = installStateMatches(
@@ -2224,6 +2291,18 @@ export async function bootstrapMoodle({
     manifestState,
     dbName,
   );
+
+  // If we restored from persistence, mark as installed to skip the snapshot/install
+  if (restoredFromPersistence) {
+    installMarkerMatches = true;
+    await writeJsonFile(php, installStatePath, {
+      ...manifestState,
+      dbName,
+      installed: true,
+      source: "persistence-restore",
+      updatedAt: nowIso(),
+    });
+  }
 
   if (installMarkerMatches) {
     publish(
