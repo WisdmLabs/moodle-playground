@@ -138,6 +138,7 @@
             <button type="button" id="logs-tab" class="panel-tab" role="tab" aria-selected="false" data-panel-tab="logs">Logs</button>
             <button type="button" id="phpinfo-tab" class="panel-tab" role="tab" aria-selected="false" data-panel-tab="phpinfo">PHP Info</button>
             <button type="button" id="blueprint-tab" class="panel-tab" role="tab" aria-selected="false" data-panel-tab="blueprint">Blueprint</button>
+            <button type="button" id="gallery-tab" class="panel-tab" role="tab" aria-selected="false" data-panel-tab="gallery">Gallery</button>
           </div>
 
           <section id="info-panel" class="side-panel__content" role="tabpanel" aria-labelledby="info-tab" data-panel-view="info">
@@ -228,6 +229,15 @@
               </span>
             </div>
             <textarea id="blueprint-textarea" class="panel-textarea" spellcheck="false" readonly></textarea>
+          </section>
+
+          <section id="gallery-panel" class="side-panel__content is-hidden" role="tabpanel" aria-labelledby="gallery-tab" data-panel-view="gallery">
+            <div class="gallery-search">
+              <input type="text" id="gallery-search-input" placeholder="Search blueprints..." />
+            </div>
+            <div id="gallery-content">
+              <!-- Populated dynamically from gallery.json -->
+            </div>
           </section>
 
           <footer class="side-panel__footer">

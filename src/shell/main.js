@@ -61,6 +61,10 @@ const els = {
   cronRunNow: document.querySelector("#cron-run-now"),
   cronInterval: document.querySelector("#cron-interval"),
   cronRunCount: document.querySelector("#cron-run-count"),
+  galleryPanel: document.querySelector("#gallery-panel"),
+  galleryTab: document.querySelector("#gallery-tab"),
+  gallerySearchInput: document.querySelector("#gallery-search-input"),
+  galleryContent: document.querySelector("#gallery-content"),
   infoPanel: document.querySelector("#info-panel"),
   infoTab: document.querySelector("#info-tab"),
   sidePanel: document.querySelector("#side-panel"),
@@ -334,6 +338,7 @@ function setActivePanel(panel) {
   const panels = {
     phpinfo: [els.phpInfoPanel, els.phpInfoTab],
     blueprint: [els.blueprintPanel, els.blueprintTab],
+    gallery: [els.galleryPanel, els.galleryTab],
     logs: [els.logsPanel, els.logsTab],
     info: [els.infoPanel, els.infoTab],
   };
@@ -643,6 +648,136 @@ function applySettingsAndReset() {
   window.location.href = url.toString();
 }
 
+let galleryLoaded = false;
+
+function showGalleryEmpty() {
+  if (!els.galleryContent) {
+    return;
+  }
+  els.galleryContent.textContent = "";
+  const p = document.createElement("p");
+  p.className = "gallery-empty";
+  p.textContent = "No blueprints found.";
+  els.galleryContent.append(p);
+}
+
+async function loadGallery() {
+  if (galleryLoaded) {
+    return;
+  }
+  galleryLoaded = true;
+
+  if (!els.galleryContent) {
+    return;
+  }
+
+  try {
+    const response = await fetch("./assets/blueprints/gallery.json");
+    if (!response.ok) {
+      showGalleryEmpty();
+      return;
+    }
+    const data = await response.json();
+    renderGallery(data);
+  } catch {
+    showGalleryEmpty();
+  }
+}
+
+function renderGallery(data) {
+  if (!els.galleryContent) {
+    return;
+  }
+
+  const categories = data.categories || [];
+  if (categories.length === 0) {
+    showGalleryEmpty();
+    return;
+  }
+
+  els.galleryContent.textContent = "";
+  for (const category of categories) {
+    const section = document.createElement("div");
+    section.className = "gallery-category";
+
+    const title = document.createElement("div");
+    title.className = "gallery-category__title";
+    title.textContent = category.name || "Untitled";
+    section.append(title);
+
+    const items = category.blueprints || [];
+    for (const item of items) {
+      const card = document.createElement("div");
+      card.className = "gallery-card";
+      card.dataset.title = (item.title || "").toLowerCase();
+      card.dataset.desc = (item.description || "").toLowerCase();
+
+      const cardTitle = document.createElement("div");
+      cardTitle.className = "gallery-card__title";
+      cardTitle.textContent = item.title || "Untitled";
+      card.append(cardTitle);
+
+      if (item.description) {
+        const cardDesc = document.createElement("div");
+        cardDesc.className = "gallery-card__desc";
+        cardDesc.textContent = item.description;
+        card.append(cardDesc);
+      }
+
+      const actions = document.createElement("div");
+      actions.className = "gallery-card__actions";
+
+      const launchBtn = document.createElement("button");
+      launchBtn.type = "button";
+      launchBtn.className = "gallery-card__launch";
+      launchBtn.textContent = "Launch";
+      launchBtn.addEventListener("click", (event) => {
+        event.stopPropagation();
+        const blueprintUrl =
+          item.file || `./assets/blueprints/examples/${item.filename}`;
+        window.location.search = `?blueprint-url=${encodeURIComponent(blueprintUrl)}`;
+      });
+      actions.append(launchBtn);
+      card.append(actions);
+
+      section.append(card);
+    }
+
+    els.galleryContent.append(section);
+  }
+}
+
+function filterGalleryCards(query) {
+  if (!els.galleryContent) {
+    return;
+  }
+
+  const normalizedQuery = (query || "").toLowerCase().trim();
+  const categories = els.galleryContent.querySelectorAll(".gallery-category");
+
+  for (const category of categories) {
+    const cards = category.querySelectorAll(".gallery-card");
+    let visibleCount = 0;
+
+    for (const card of cards) {
+      const titleText = card.dataset.title || "";
+      const descText = card.dataset.desc || "";
+      const matches =
+        !normalizedQuery ||
+        titleText.includes(normalizedQuery) ||
+        descText.includes(normalizedQuery);
+
+      card.style.display = matches ? "" : "none";
+      if (matches) {
+        visibleCount++;
+      }
+    }
+
+    // Hide category heading if no cards match
+    category.style.display = visibleCount > 0 ? "" : "none";
+  }
+}
+
 async function main() {
   config = await loadPlaygroundConfig();
   activeBlueprint = await resolveBlueprint({
@@ -749,6 +884,15 @@ els.phpInfoTab.addEventListener("click", () => {
   capturePhpInfoViaWorker("tab-click");
 });
 els.blueprintTab.addEventListener("click", () => setActivePanel("blueprint"));
+els.galleryTab.addEventListener("click", () => {
+  setActivePanel("gallery");
+  loadGallery();
+});
+if (els.gallerySearchInput) {
+  els.gallerySearchInput.addEventListener("input", () => {
+    filterGalleryCards(els.gallerySearchInput.value);
+  });
+}
 els.clearLogs.addEventListener("click", () => {
   els.logPanel.textContent = "";
 });

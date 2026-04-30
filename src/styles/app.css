@@ -826,6 +826,91 @@ button.danger:hover {
   display: block;
 }
 
+/* ── Blueprint gallery ────────────────────────────── */
+.gallery-search {
+  padding: var(--space-sm);
+}
+
+.gallery-search input {
+  width: 100%;
+  padding: 6px var(--space-sm);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  background: var(--bg-input);
+  color: var(--text);
+}
+
+.gallery-search input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--color-orange-light);
+  outline: none;
+}
+
+.gallery-category {
+  padding: 0 var(--space-sm);
+}
+
+.gallery-category__title {
+  font-weight: 600;
+  font-size: 13px;
+  padding: var(--space-sm) 0 var(--space-xs);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.gallery-card {
+  padding: var(--space-sm);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--space-sm);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.gallery-card:hover {
+  background: var(--bg-surface-muted);
+}
+
+.gallery-card__title {
+  font-weight: 600;
+  font-size: 13px;
+  margin-bottom: 2px;
+}
+
+.gallery-card__desc {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.gallery-card__actions {
+  margin-top: 6px;
+  display: flex;
+  gap: 6px;
+}
+
+.gallery-card__launch {
+  padding: 3px 10px;
+  font-size: 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
+  cursor: pointer;
+}
+
+.gallery-card__launch:hover {
+  background: var(--color-gray-100);
+}
+
+.gallery-empty {
+  padding: var(--space-lg);
+  color: var(--text-muted);
+  font-size: 13px;
+  text-align: center;
+}
+
 /* ── Responsive ───────────────────────────────────── */
 @media (max-width: 1080px) {
   .workspace {
