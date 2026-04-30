@@ -467,6 +467,43 @@ function bindFrameNavigation(scopeId, runtimeId) {
   });
 }
 
+let clientRequestId = 0;
+const pendingClientRequests = new Map();
+
+function forwardToWorker(operation, data) {
+  return new Promise((resolve, reject) => {
+    const requestId = ++clientRequestId;
+    const timer = setTimeout(() => {
+      pendingClientRequests.delete(requestId);
+      reject(new Error(`Worker operation ${operation} timed out`));
+    }, 60_000);
+    pendingClientRequests.set(requestId, { resolve, reject, timer });
+    phpWorker?.postMessage({
+      kind: "client-request",
+      requestId,
+      operation,
+      ...data,
+    });
+  });
+}
+
+function setupWorkerResponseListener() {
+  if (!phpWorker) return;
+  phpWorker.addEventListener("message", (event) => {
+    const msg = event.data;
+    if (msg?.kind !== "client-response") return;
+    const pending = pendingClientRequests.get(msg.requestId);
+    if (!pending) return;
+    clearTimeout(pending.timer);
+    pendingClientRequests.delete(msg.requestId);
+    if (msg.error) {
+      pending.reject(new Error(msg.error));
+    } else {
+      pending.resolve(msg.result);
+    }
+  });
+}
+
 async function handleClientMessage(message, scopeId, runtimeId) {
   const { type, id } = message;
 
@@ -490,21 +527,140 @@ async function handleClientMessage(message, scopeId, runtimeId) {
         navigateFrame(scopeId, runtimeId, message.path || "/");
         reply({ ok: true });
         break;
+      case "get-website-url":
+        reply({ url: window.location.href });
+        break;
+      case "get-current-url":
+        reply({ path: activePath });
+        break;
+      case "reset-site":
+        window.location.reload();
+        reply({ ok: true });
+        break;
       case "run-php":
       case "list-files":
       case "read-file":
       case "write-file":
+      case "mkdir":
+      case "delete-file":
+      case "delete-directory":
+      case "file-exists":
       case "export-site":
       case "import-site":
-        // Forward to worker
-        phpWorker?.postMessage({ kind: type, ...message, source: undefined });
-        reply({ ok: true, forwarded: true });
+      case "get-site-info":
+      case "set-config":
+      case "install-plugin":
+      case "get-blueprint":
+      case "apply-blueprint": {
+        const result = await forwardToWorker(type, message);
+        reply(result);
         break;
+      }
       default:
         replyError(`Unknown client message type: ${type}`);
     }
   } catch (error) {
     replyError(error.message || String(error));
+  }
+}
+
+function connectMcpWebSocket(url, scopeId, runtimeId) {
+  let ws;
+  let retryDelay = 1000;
+
+  function connect() {
+    try {
+      ws = new WebSocket(url);
+    } catch {
+      scheduleRetry();
+      return;
+    }
+
+    ws.addEventListener("open", () => {
+      retryDelay = 1000;
+      console.log("[mcp-ws] Connected to MCP server");
+    });
+
+    ws.addEventListener("message", async (event) => {
+      try {
+        const msg = JSON.parse(event.data);
+        if (msg.type !== "tool-call") return;
+
+        const { requestId, toolName, arguments: args } = msg;
+        try {
+          const result = await dispatchMcpToolCall(toolName, args, scopeId, runtimeId);
+          ws.send(JSON.stringify({ responseId: requestId, result }));
+        } catch (error) {
+          ws.send(JSON.stringify({ responseId: requestId, error: error.message }));
+        }
+      } catch {
+        // Ignore malformed messages
+      }
+    });
+
+    ws.addEventListener("close", () => {
+      console.log("[mcp-ws] Disconnected, will retry");
+      scheduleRetry();
+    });
+
+    ws.addEventListener("error", () => {
+      // close event will fire after this
+    });
+  }
+
+  function scheduleRetry() {
+    setTimeout(() => {
+      retryDelay = Math.min(retryDelay * 2, 30_000);
+      connect();
+    }, retryDelay);
+  }
+
+  connect();
+}
+
+const TOOL_TO_OPERATION = {
+  "moodle/navigate": "navigate",
+  "moodle/runPhp": "run-php",
+  "moodle/readFile": "read-file",
+  "moodle/writeFile": "write-file",
+  "moodle/listFiles": "list-files",
+  "moodle/exportSite": "export-site",
+  "moodle/importSite": "import-site",
+  "moodle/getWebsiteUrl": "get-website-url",
+  "moodle/getSiteInfo": "get-site-info",
+  "moodle/getCurrentUrl": "get-current-url",
+  "moodle/resetSite": "reset-site",
+  "moodle/saveSite": "export-site",
+  "moodle/mkdir": "mkdir",
+  "moodle/deleteFile": "delete-file",
+  "moodle/deleteDirectory": "delete-directory",
+  "moodle/fileExists": "file-exists",
+  "moodle/applyBlueprint": "apply-blueprint",
+  "moodle/getBlueprint": "get-blueprint",
+  "moodle/setConfig": "set-config",
+  "moodle/installPlugin": "install-plugin",
+  "moodle/listSites": "list-sites",
+};
+
+async function dispatchMcpToolCall(toolName, args, scopeId, runtimeId) {
+  const operation = TOOL_TO_OPERATION[toolName];
+  if (!operation) throw new Error(`Unknown tool: ${toolName}`);
+
+  switch (operation) {
+    case "navigate":
+      navigateFrame(scopeId, runtimeId, args.path || "/");
+      return { ok: true };
+    case "get-website-url":
+      return { url: window.location.href };
+    case "get-current-url":
+      return { path: activePath };
+    case "reset-site":
+      window.location.reload();
+      return { ok: true };
+    case "list-sites":
+      return [{ scopeId, runtimeId, url: window.location.href }];
+    default:
+      return forwardToWorker(operation, args);
   }
 }
 
@@ -742,8 +898,15 @@ async function bootstrapRemote() {
     path: requestedPath,
   });
 
+  setupWorkerResponseListener();
   bindShellCommands(scopeId, selection.runtimeId);
   bindFrameNavigation(scopeId, selection.runtimeId);
+
+  const mcpWs = url.searchParams.get("mcpWs") || url.searchParams.get("mcp-ws");
+  if (mcpWs) {
+    connectMcpWebSocket(mcpWs, scopeId, selection.runtimeId);
+  }
+
   // Navigate to the requested path only if the ready handler hasn't
   // already navigated to a fresh readyPath from bootstrap. This avoids
   // a wasted PHP request to a stale path from a previous session.

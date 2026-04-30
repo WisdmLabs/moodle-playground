@@ -1,10 +1,8 @@
 /**
  * MCP (Model Context Protocol) bridge for Moodle Playground.
  *
- * MVP implementation: postMessage-based, works when embedded in
- * IDE extensions (VS Code, JetBrains) or controlled via the client library.
- *
- * Full WebSocket-based bridge requires a companion CLI tool (deferred).
+ * Supports 21 tools for AI agent control via postMessage (IDE extensions,
+ * client library) and WebSocket (standalone MCP server).
  */
 
 const MCP_VERSION = "2024-11-05";
@@ -50,6 +48,72 @@ export class McpBridge {
     this.#handlers.set("moodle/importSite", async (params) => {
       return this.#sendToPlayground("import-site", { data: params.data });
     });
+
+    this.#handlers.set("moodle/getWebsiteUrl", async () => {
+      return this.#sendToPlayground("get-website-url");
+    });
+
+    this.#handlers.set("moodle/getSiteInfo", async () => {
+      return this.#sendToPlayground("get-site-info");
+    });
+
+    this.#handlers.set("moodle/getCurrentUrl", async () => {
+      return this.#sendToPlayground("get-current-url");
+    });
+
+    this.#handlers.set("moodle/resetSite", async () => {
+      return this.#sendToPlayground("reset-site");
+    });
+
+    this.#handlers.set("moodle/saveSite", async () => {
+      return this.#sendToPlayground("export-site");
+    });
+
+    this.#handlers.set("moodle/mkdir", async (params) => {
+      return this.#sendToPlayground("mkdir", { path: params.path });
+    });
+
+    this.#handlers.set("moodle/deleteFile", async (params) => {
+      return this.#sendToPlayground("delete-file", { path: params.path });
+    });
+
+    this.#handlers.set("moodle/deleteDirectory", async (params) => {
+      return this.#sendToPlayground("delete-directory", { path: params.path });
+    });
+
+    this.#handlers.set("moodle/fileExists", async (params) => {
+      return this.#sendToPlayground("file-exists", { path: params.path });
+    });
+
+    this.#handlers.set("moodle/applyBlueprint", async (params) => {
+      return this.#sendToPlayground("apply-blueprint", {
+        blueprint: params.blueprint,
+      });
+    });
+
+    this.#handlers.set("moodle/getBlueprint", async () => {
+      return this.#sendToPlayground("get-blueprint");
+    });
+
+    this.#handlers.set("moodle/setConfig", async (params) => {
+      return this.#sendToPlayground("set-config", {
+        name: params.name,
+        value: params.value,
+        plugin: params.plugin,
+      });
+    });
+
+    this.#handlers.set("moodle/installPlugin", async (params) => {
+      return this.#sendToPlayground("install-plugin", {
+        url: params.url,
+        pluginType: params.pluginType,
+        pluginName: params.pluginName,
+      });
+    });
+
+    this.#handlers.set("moodle/listSites", async () => {
+      return this.#sendToPlayground("list-sites");
+    });
   }
 
   #sendToPlayground(type, payload = {}) {
@@ -76,7 +140,7 @@ export class McpBridge {
       setTimeout(() => {
         window.removeEventListener("message", handler);
         reject(new Error(`MCP request ${type} timed out`));
-      }, 30000);
+      }, 60000);
     });
   }
 
@@ -155,6 +219,112 @@ export class McpBridge {
           },
           required: ["data"],
         },
+      },
+      {
+        name: "moodle/getWebsiteUrl",
+        description: "Get the current playground website URL",
+        inputSchema: { type: "object", properties: {} },
+      },
+      {
+        name: "moodle/getSiteInfo",
+        description: "Get Moodle site information",
+        inputSchema: { type: "object", properties: {} },
+      },
+      {
+        name: "moodle/getCurrentUrl",
+        description: "Get the current page path within Moodle",
+        inputSchema: { type: "object", properties: {} },
+      },
+      {
+        name: "moodle/resetSite",
+        description: "Reset the playground to a fresh install state",
+        inputSchema: { type: "object", properties: {} },
+      },
+      {
+        name: "moodle/saveSite",
+        description: "Save the current site state (alias for exportSite)",
+        inputSchema: { type: "object", properties: {} },
+      },
+      {
+        name: "moodle/mkdir",
+        description: "Create a directory in MEMFS",
+        inputSchema: {
+          type: "object",
+          properties: { path: { type: "string", description: "Directory path" } },
+          required: ["path"],
+        },
+      },
+      {
+        name: "moodle/deleteFile",
+        description: "Delete a file from MEMFS",
+        inputSchema: {
+          type: "object",
+          properties: { path: { type: "string", description: "File path" } },
+          required: ["path"],
+        },
+      },
+      {
+        name: "moodle/deleteDirectory",
+        description: "Delete a directory from MEMFS",
+        inputSchema: {
+          type: "object",
+          properties: { path: { type: "string", description: "Directory path" } },
+          required: ["path"],
+        },
+      },
+      {
+        name: "moodle/fileExists",
+        description: "Check if a file or directory exists in MEMFS",
+        inputSchema: {
+          type: "object",
+          properties: { path: { type: "string", description: "Path to check" } },
+          required: ["path"],
+        },
+      },
+      {
+        name: "moodle/applyBlueprint",
+        description: "Apply a blueprint JSON to the running instance",
+        inputSchema: {
+          type: "object",
+          properties: { blueprint: { type: "object", description: "Blueprint JSON" } },
+          required: ["blueprint"],
+        },
+      },
+      {
+        name: "moodle/getBlueprint",
+        description: "Get the currently active blueprint",
+        inputSchema: { type: "object", properties: {} },
+      },
+      {
+        name: "moodle/setConfig",
+        description: "Set a Moodle configuration value",
+        inputSchema: {
+          type: "object",
+          properties: {
+            name: { type: "string", description: "Config name" },
+            value: { type: "string", description: "Config value" },
+            plugin: { type: "string", description: "Plugin name (optional)" },
+          },
+          required: ["name", "value"],
+        },
+      },
+      {
+        name: "moodle/installPlugin",
+        description: "Install a Moodle plugin from a ZIP URL",
+        inputSchema: {
+          type: "object",
+          properties: {
+            url: { type: "string", description: "GitHub archive ZIP URL" },
+            pluginType: { type: "string", description: "Plugin type (auto-detected)" },
+            pluginName: { type: "string", description: "Plugin name (auto-detected)" },
+          },
+          required: ["url"],
+        },
+      },
+      {
+        name: "moodle/listSites",
+        description: "List active playground instances",
+        inputSchema: { type: "object", properties: {} },
       },
     ];
   }

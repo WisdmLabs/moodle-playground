@@ -95,6 +95,7 @@ let currentAddonProxyUrl = null;
 let currentPhpCorsProxyUrl = null;
 let currentDebugParam = null;
 let currentProfileParam = null;
+let currentMcpWs = null;
 let currentPath = "/";
 let channel;
 let serviceWorkerReady = null;
@@ -198,6 +199,7 @@ async function updateFrame() {
     phpCorsProxyUrl: currentPhpCorsProxyUrl,
     debug: currentDebugParam,
     profile: currentProfileParam,
+    mcpWs: currentMcpWs,
   });
   if (pendingCleanBoot) {
     url.searchParams.set("clean", "1");
@@ -904,6 +906,7 @@ async function main() {
   currentProfileParam = urlParams.profile;
   currentAddonProxyUrl = urlParams.addonProxyUrl;
   currentPhpCorsProxyUrl = urlParams.phpCorsProxyUrl;
+  currentMcpWs = urlParams.mcpWs;
   applyRuntimeSelection(selection);
   traceRuntimeSelection(
     "resolved",

@@ -835,6 +835,141 @@ function handleCronMessage(data) {
   }
 }
 
+async function handleClientRequest(data) {
+  const { requestId, operation } = data;
+
+  function replyOk(result) {
+    self.postMessage({ kind: "client-response", requestId, result });
+  }
+
+  function replyErr(error) {
+    self.postMessage({ kind: "client-response", requestId, error: String(error?.message || error) });
+  }
+
+  try {
+    const state = await getRuntimeState();
+    const php = state.php;
+    const rawPhp = php._php;
+
+    switch (operation) {
+      case "run-php": {
+        const result = await php.run(data.code);
+        replyOk({ text: result?.text || "", errors: result?.errors || "" });
+        break;
+      }
+      case "list-files": {
+        const dir = data.dir || "/";
+        const entries = rawPhp.listFiles(dir);
+        replyOk(entries);
+        break;
+      }
+      case "read-file": {
+        const buf = rawPhp.readFileAsBuffer(data.path);
+        replyOk({ data: Array.from(new Uint8Array(buf)) });
+        break;
+      }
+      case "write-file": {
+        const content = typeof data.data === "string"
+          ? new TextEncoder().encode(data.data)
+          : new Uint8Array(data.data);
+        rawPhp.writeFile(data.path, content);
+        replyOk({ ok: true });
+        break;
+      }
+      case "mkdir": {
+        rawPhp.mkdirTree(data.path);
+        replyOk({ ok: true });
+        break;
+      }
+      case "delete-file": {
+        rawPhp.unlink(data.path);
+        replyOk({ ok: true });
+        break;
+      }
+      case "delete-directory": {
+        rawPhp.rmdir(data.path);
+        replyOk({ ok: true });
+        break;
+      }
+      case "file-exists": {
+        const exists = rawPhp.fileExists(data.path);
+        replyOk({ exists });
+        break;
+      }
+      case "get-site-info": {
+        const result = await php.run(`<?php
+define('CLI_SCRIPT', true);
+require('/www/moodle/config.php');
+echo json_encode([
+  'siteName' => $SITE->fullname ?? '',
+  'moodleVersion' => $CFG->release ?? '',
+  'moodleBranch' => $CFG->branch ?? '',
+  'wwwroot' => $CFG->wwwroot ?? '',
+  'phpVersion' => PHP_VERSION,
+  'dbType' => $CFG->dbtype ?? '',
+  'adminUser' => get_admin()->username ?? 'admin',
+]);`);
+        const info = JSON.parse(result?.text || "{}");
+        replyOk(info);
+        break;
+      }
+      case "set-config": {
+        const plugin = data.plugin ? `'${data.plugin.replace(/'/g, "\\'")}'` : "null";
+        const name = data.name.replace(/'/g, "\\'");
+        const value = data.value.replace(/'/g, "\\'");
+        await php.run(`<?php
+define('CLI_SCRIPT', true);
+require('/www/moodle/config.php');
+set_config('${name}', '${value}', ${plugin});
+echo json_encode(['ok' => true]);`);
+        replyOk({ ok: true });
+        break;
+      }
+      case "install-plugin": {
+        const step = {
+          step: "installMoodlePlugin",
+          url: data.url,
+        };
+        if (data.pluginType) step.pluginType = data.pluginType;
+        if (data.pluginName) step.pluginName = data.pluginName;
+        replyOk({ ok: true, step, note: "Plugin installation requires blueprint executor (use applyBlueprint)" });
+        break;
+      }
+      case "export-site": {
+        const { collectSnapshot } = await import("./src/persistence/snapshot.js");
+        const { createPlaygroundZip } = await import("./src/persistence/export.js");
+        const snap = collectSnapshot(php, {
+          dbFilePath: buildDbPath(),
+          moodleBranch,
+          phpVersion,
+          webRoot: activeWebRoot,
+          activeBlueprint,
+        });
+        const zipData = createPlaygroundZip(snap);
+        replyOk({ data: Array.from(zipData) });
+        break;
+      }
+      case "import-site": {
+        const { importPlaygroundZip } = await import("./src/persistence/import.js");
+        const meta = importPlaygroundZip(data.data, php, {
+          dbFilePath: buildDbPath(),
+          webRoot: activeWebRoot,
+        });
+        replyOk({ metadata: meta });
+        break;
+      }
+      case "get-blueprint": {
+        replyOk(activeBlueprint || null);
+        break;
+      }
+      default:
+        replyErr(`Unknown client operation: ${operation}`);
+    }
+  } catch (error) {
+    replyErr(error);
+  }
+}
+
 function installMessageListener() {
   self.addEventListener("message", (event) => {
     if (event.data?.kind?.startsWith("cron-")) {
@@ -891,6 +1026,11 @@ function installMessageListener() {
       } else {
         postShell({ kind: "persistence-info", backend: "none", totalSize: 0, fileCount: 0, lastModified: 0 });
       }
+      return;
+    }
+
+    if (event.data?.kind === "client-request") {
+      handleClientRequest(event.data);
       return;
     }
 

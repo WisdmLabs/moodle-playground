@@ -1,0 +1,20 @@
+{
+  "name": "@moodle-playground/mcp",
+  "version": "0.1.0",
+  "description": "MCP server for controlling Moodle Playground from AI agents",
+  "type": "module",
+  "bin": {
+    "moodle-playground-mcp": "./bin/mcp-server.js"
+  },
+  "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "files": ["bin/", "src/", "README.md"],
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.1",
+    "ws": "^8.18.0"
+  },
+  "keywords": ["moodle", "playground", "mcp", "ai", "agent", "wasm"],
+  "license": "MIT"
+}

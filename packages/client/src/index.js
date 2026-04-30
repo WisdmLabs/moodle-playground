@@ -4,6 +4,7 @@
 
 const DEFAULT_REMOTE_URL = "https://moodle-playground.com/remote.html";
 const READY_TIMEOUT_MS = 120000;
+const REQUEST_TIMEOUT_MS = 60000;
 
 export async function startMoodlePlayground(iframe, options = {}) {
   const {
@@ -56,7 +57,7 @@ function createPlaygroundClient(iframe) {
           pendingRequests.delete(id);
           reject(new Error(`Request ${type} timed out`));
         }
-      }, 30000);
+      }, REQUEST_TIMEOUT_MS);
     });
   }
 
@@ -124,6 +125,62 @@ function createPlaygroundClient(iframe) {
       return sendMessage("import-site", {
         data: Array.from(new Uint8Array(zipArrayBuffer)),
       });
+    },
+
+    async getWebsiteUrl() {
+      return sendMessage("get-website-url");
+    },
+
+    async getSiteInfo() {
+      return sendMessage("get-site-info");
+    },
+
+    async getCurrentUrl() {
+      return sendMessage("get-current-url");
+    },
+
+    async resetSite() {
+      return sendMessage("reset-site");
+    },
+
+    async saveSite() {
+      return sendMessage("export-site");
+    },
+
+    async mkdir(path) {
+      return sendMessage("mkdir", { path });
+    },
+
+    async deleteFile(path) {
+      return sendMessage("delete-file", { path });
+    },
+
+    async deleteDirectory(path) {
+      return sendMessage("delete-directory", { path });
+    },
+
+    async fileExists(path) {
+      return sendMessage("file-exists", { path });
+    },
+
+    async applyBlueprint(blueprint) {
+      return sendMessage("apply-blueprint", { blueprint });
+    },
+
+    async getBlueprint() {
+      return sendMessage("get-blueprint");
+    },
+
+    async setConfig(name, value, plugin) {
+      return sendMessage("set-config", { name, value, plugin });
+    },
+
+    async installPlugin(url, pluginType, pluginName) {
+      return sendMessage("install-plugin", { url, pluginType, pluginName });
+    },
+
+    async listSites() {
+      return sendMessage("list-sites");
     },
 
     destroy() {

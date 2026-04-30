@@ -25,6 +25,7 @@ export function resolveRemoteUrl(
     phpCorsProxyUrl,
     debug,
     profile,
+    mcpWs,
   } = {},
 ) {
   const url = new URL("./remote.html", window.location.href);
@@ -48,6 +49,9 @@ export function resolveRemoteUrl(
   }
   if (profile) {
     url.searchParams.set("profile", profile);
+  }
+  if (mcpWs) {
+    url.searchParams.set("mcp-ws", mcpWs);
   }
   return url;
 }

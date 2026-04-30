@@ -388,6 +388,7 @@ export function parseQueryParams(urlOrSearchParams) {
     importSite: params.get("import-site") || null,
     moodlePr: params.get("moodle-pr") || null,
     mcp: params.get("mcp") || null,
+    mcpWs: params.get("mcp-ws") || null,
   };
 }
 
