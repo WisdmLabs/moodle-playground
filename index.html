@@ -188,8 +188,13 @@
                 <button type="button" id="cron-run-now" disabled>Run Now</button>
               </div>
             </div>
-
+            <div class="settings-field" id="persistence-status-row" style="display:none">
+              <span>Storage</span>
+              <span id="persistence-status" class="settings-value">-</span>
+            </div>
             <div class="settings-actions">
+              <button type="button" id="save-state-button" style="display:none">Save State</button>
+              <button type="button" id="reset-storage-button" class="danger" style="display:none">Clear Saved Data</button>
               <button type="button" id="reset-button" class="danger">Reset Playground</button>
             </div>
           </section>

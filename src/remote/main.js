@@ -496,6 +496,14 @@ function bindShellCommands(scopeId, runtimeId) {
     if (message?.kind?.startsWith("cron-")) {
       phpWorker?.postMessage(message);
     }
+
+    if (
+      message?.kind === "persistence-save" ||
+      message?.kind === "persistence-reset" ||
+      message?.kind === "persistence-info"
+    ) {
+      phpWorker?.postMessage({ kind: message.kind });
+    }
   });
 }
 

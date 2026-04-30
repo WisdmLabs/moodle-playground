@@ -65,6 +65,10 @@ const els = {
   infoTab: document.querySelector("#info-tab"),
   sidePanel: document.querySelector("#side-panel"),
   workspace: document.querySelector("#workspace"),
+  saveStateButton: document.querySelector("#save-state-button"),
+  resetStorageButton: document.querySelector("#reset-storage-button"),
+  persistenceStatusRow: document.querySelector("#persistence-status-row"),
+  persistenceStatus: document.querySelector("#persistence-status"),
 };
 
 const scopeId = getOrCreateScopeId();
@@ -437,6 +441,8 @@ function bindShellChannel() {
         }
         els.address.value = currentPath;
         saveState({ lastReadyAt: new Date().toISOString() });
+        // Request persistence storage info once runtime is ready
+        postToRemote({ kind: "persistence-info" });
         break;
       case "frame-ready":
         remoteFrameBooted = true;
@@ -480,10 +486,45 @@ function bindShellChannel() {
       case "trace":
         appendLog(message.detail || "[trace]");
         break;
+      case "persistence-saved":
+        appendLog(message.detail || "State saved.");
+        break;
+      case "persistence-reset":
+        appendLog(message.detail || "Persistent storage cleared.");
+        break;
+      case "persistence-info":
+        updatePersistenceStatus(message);
+        break;
       default:
         break;
     }
   });
+}
+
+function formatBytes(bytes) {
+  if (bytes === 0) return "0 B";
+  const units = ["B", "KB", "MB", "GB"];
+  const i = Math.floor(Math.log(bytes) / Math.log(1024));
+  return `${(bytes / 1024 ** i).toFixed(i > 0 ? 1 : 0)} ${units[i]}`;
+}
+
+function updatePersistenceStatus(info) {
+  if (!els.persistenceStatusRow || !els.persistenceStatus) return;
+  if (info.backend === "none") {
+    els.persistenceStatusRow.style.display = "none";
+    if (els.saveStateButton) els.saveStateButton.style.display = "none";
+    if (els.resetStorageButton) els.resetStorageButton.style.display = "none";
+    return;
+  }
+  els.persistenceStatusRow.style.display = "";
+  if (els.saveStateButton) els.saveStateButton.style.display = "";
+  if (els.resetStorageButton) els.resetStorageButton.style.display = "";
+  const label = info.backend === "opfs" ? "OPFS" : "IndexedDB";
+  if (info.fileCount > 0) {
+    els.persistenceStatus.textContent = `${label} -- ${formatBytes(info.totalSize)}, ${info.fileCount} files`;
+  } else {
+    els.persistenceStatus.textContent = `${label} -- empty`;
+  }
 }
 
 function bindServiceWorkerMessages() {
@@ -741,6 +782,23 @@ if (els.cronInterval) {
     if (ms > 0) {
       postCronMessage({ kind: "cron-set-interval", interval: ms });
     }
+  });
+}
+
+if (els.saveStateButton) {
+  els.saveStateButton.addEventListener("click", () => {
+    if (uiLocked) return;
+    appendLog("Saving state to persistent storage...");
+    postToRemote({ kind: "persistence-save" });
+  });
+}
+
+if (els.resetStorageButton) {
+  els.resetStorageButton.addEventListener("click", () => {
+    if (uiLocked) return;
+    if (!confirm("Clear all saved data? This cannot be undone.")) return;
+    appendLog("Clearing persistent storage...");
+    postToRemote({ kind: "persistence-reset" });
   });
 }
 
