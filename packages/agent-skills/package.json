@@ -1,0 +1,13 @@
+{
+  "name": "@moodle-playground/agent-skills",
+  "version": "0.1.0",
+  "description": "AI agent skills for Moodle Playground — Claude Code, Cursor, Copilot",
+  "type": "module",
+  "main": "install.js",
+  "bin": {
+    "moodle-playground-skills": "./install.js"
+  },
+  "files": ["skills/", "install.js", "README.md"],
+  "keywords": ["moodle", "playground", "ai", "agent", "skills", "claude", "cursor"],
+  "license": "MIT"
+}

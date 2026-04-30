@@ -10,9 +10,10 @@
   "exports": {
     ".": "./src/index.js"
   },
-  "files": ["bin/", "src/", "README.md"],
+  "files": ["bin/", "src/", "config/", "README.md"],
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.1",
+    "open": "^10.1.0",
     "ws": "^8.18.0"
   },
   "keywords": ["moodle", "playground", "mcp", "ai", "agent", "wasm"],
