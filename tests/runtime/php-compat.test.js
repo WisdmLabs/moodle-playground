@@ -10,8 +10,30 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-// Replicate the pure functions from php-compat.js for testing
+// Replicate the pure functions from php-compat.js for testing.
+// Must stay in sync with the source — includes the known-script shortlist.
+const KNOWN_ASSET_SCRIPTS = new Set([
+  "/theme/styles.php",
+  "/theme/styles_debug.php",
+  "/lib/javascript.php",
+  "/theme/image.php",
+  "/theme/font.php",
+  "/lib/yui_combo.php",
+  "/pluginfile.php",
+  "/draftfile.php",
+  "/tokenpluginfile.php",
+]);
+
 function resolveScriptPath(pathname, webRoot) {
+  // Fast path: check known asset scripts first
+  for (const script of KNOWN_ASSET_SCRIPTS) {
+    if (pathname.startsWith(script + "/") || pathname === script) {
+      const scriptPath = `${webRoot}${script}`;
+      const pathInfo = pathname.substring(script.length);
+      return { scriptPath, pathInfo };
+    }
+  }
+
   const phpIdx = pathname.indexOf(".php/");
   if (phpIdx >= 0) {
     const scriptPath = `${webRoot}${pathname.substring(0, phpIdx + 4)}`;
@@ -105,6 +127,67 @@ describe("resolveScriptPath", () => {
   it("works with 5.1+ webRoot", () => {
     const result = resolveScriptPath("/admin/index.php", "/www/moodle/public");
     assert.strictEqual(result.scriptPath, "/www/moodle/public/admin/index.php");
+  });
+
+  // Known-script shortlist tests
+  it("resolves styles_debug.php via known-script shortlist", () => {
+    const result = resolveScriptPath(
+      "/theme/styles_debug.php/boost/123/all",
+      webRoot,
+    );
+    assert.strictEqual(result.scriptPath, "/www/moodle/theme/styles_debug.php");
+    assert.strictEqual(result.pathInfo, "/boost/123/all");
+  });
+
+  it("resolves javascript.php via known-script shortlist", () => {
+    const result = resolveScriptPath(
+      "/lib/javascript.php/1234/lib/amd/src/module.js",
+      webRoot,
+    );
+    assert.strictEqual(result.scriptPath, "/www/moodle/lib/javascript.php");
+    assert.strictEqual(result.pathInfo, "/1234/lib/amd/src/module.js");
+  });
+
+  it("resolves pluginfile.php via known-script shortlist", () => {
+    const result = resolveScriptPath(
+      "/pluginfile.php/5/user/icon/f1",
+      webRoot,
+    );
+    assert.strictEqual(result.scriptPath, "/www/moodle/pluginfile.php");
+    assert.strictEqual(result.pathInfo, "/5/user/icon/f1");
+  });
+
+  it("resolves font.php via known-script shortlist", () => {
+    const result = resolveScriptPath(
+      "/theme/font.php/boost/core/123/fa-regular-400.woff2",
+      webRoot,
+    );
+    assert.strictEqual(result.scriptPath, "/www/moodle/theme/font.php");
+    assert.strictEqual(result.pathInfo, "/boost/core/123/fa-regular-400.woff2");
+  });
+
+  it("resolves known script without PATH_INFO", () => {
+    const result = resolveScriptPath("/pluginfile.php", webRoot);
+    assert.strictEqual(result.scriptPath, "/www/moodle/pluginfile.php");
+    assert.strictEqual(result.pathInfo, "");
+  });
+
+  it("resolves tokenpluginfile.php via known-script shortlist", () => {
+    const result = resolveScriptPath(
+      "/tokenpluginfile.php/abc123/mod_resource/content/0/file.pdf",
+      webRoot,
+    );
+    assert.strictEqual(result.scriptPath, "/www/moodle/tokenpluginfile.php");
+    assert.strictEqual(result.pathInfo, "/abc123/mod_resource/content/0/file.pdf");
+  });
+
+  it("resolves yui_combo.php via known-script shortlist", () => {
+    const result = resolveScriptPath(
+      "/lib/yui_combo.php/combo?rollup/3.18.1/yui-moodlesimple-min.js",
+      webRoot,
+    );
+    assert.strictEqual(result.scriptPath, "/www/moodle/lib/yui_combo.php");
+    assert.strictEqual(result.pathInfo, "/combo?rollup/3.18.1/yui-moodlesimple-min.js");
   });
 });
 

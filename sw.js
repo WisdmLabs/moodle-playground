@@ -21,10 +21,13 @@ const SCOPED_STATIC_RE = /\.(css|js|mjs|woff2?|ttf|otf|eot|png|jpe?g|gif|svg|ico
 // PHP scripts that serve cacheable assets with revision numbers in the URL.
 // The revision acts as a natural cache key — when content changes, the URL changes.
 // Excludes pluginfile.php and draftfile.php (user content, not cacheable).
-const CACHEABLE_PHP_ASSET_RE = /\/(theme\/styles\.php|lib\/javascript\.php|theme\/image\.php|theme\/font\.php)\//u;
+const CACHEABLE_PHP_ASSET_RE = /\/(theme\/styles\.php|theme\/styles_debug\.php|lib\/javascript\.php|theme\/image\.php|theme\/font\.php|lib\/yui_combo\.php)\//u;
 const INTERNAL_PROXY_PATH = "/__playground_proxy__";
 let playgroundConfigPromise;
 let addonProxyUrlOverride = null;
+// Debug logging for asset loading — enabled by ?debug=true on any client URL
+// or by sending { kind: "configure-service-worker", debug: true } message.
+let swDebugMode = new URL(self.location.href).searchParams.get("debug") === "true";
 
 function isScopedStaticAsset(requestPath) {
   return SCOPED_STATIC_RE.test(requestPath.split("?")[0]);
@@ -472,16 +475,39 @@ function rewriteHtmlDocument(html, scope) {
   // match both escaped (http:\/\/host) and unescaped (http://host) forms.
   const jsonEscapedOrigin = JSON.stringify(origin).slice(1, -1);
   const jsonEscapedBase = JSON.stringify(scopedBase).slice(1, -1);
-  // Match JSON-escaped form: "wwwroot":"http:\/\/localhost:8080"
-  result = result.replaceAll(
-    `"wwwroot":"${jsonEscapedOrigin}"`,
-    `"wwwroot":"${jsonEscapedBase}"`,
-  );
-  // Match unescaped form (if present): "wwwroot":"http://localhost:8080"
-  result = result.replaceAll(
-    `"wwwroot":"${origin}"`,
-    `"wwwroot":"${scopedBase}"`,
-  );
+
+  // Guard: only rewrite wwwroot if it hasn't already been scoped.
+  // This prevents double-prefixing when the HTML already contains the
+  // scoped URL (e.g., from a cached response or Moodle generating the
+  // scoped URL itself after a previous rewrite).
+  if (!result.includes(`"wwwroot":"${jsonEscapedBase}"`)) {
+    // Match JSON-escaped form: "wwwroot":"http:\/\/localhost:8080"
+    result = result.replaceAll(
+      `"wwwroot":"${jsonEscapedOrigin}"`,
+      `"wwwroot":"${jsonEscapedBase}"`,
+    );
+  }
+  if (!result.includes(`"wwwroot":"${scopedBase}"`)) {
+    // Match unescaped form (if present): "wwwroot":"http://localhost:8080"
+    result = result.replaceAll(
+      `"wwwroot":"${origin}"`,
+      `"wwwroot":"${scopedBase}"`,
+    );
+  }
+  // Also rewrite httpswwwroot which Moodle may output alongside wwwroot
+  // in its inline JS config for HTTPS-aware URL construction.
+  if (!result.includes(`"httpswwwroot":"${jsonEscapedBase}"`)) {
+    result = result.replaceAll(
+      `"httpswwwroot":"${jsonEscapedOrigin}"`,
+      `"httpswwwroot":"${jsonEscapedBase}"`,
+    );
+  }
+  if (!result.includes(`"httpswwwroot":"${scopedBase}"`)) {
+    result = result.replaceAll(
+      `"httpswwwroot":"${origin}"`,
+      `"httpswwwroot":"${scopedBase}"`,
+    );
+  }
   // Also rewrite apibase which some Moodle JS uses for REST API calls
   result = result.replaceAll(
     `"apibase":"${jsonEscapedOrigin}\\/r.php\\/api"`,
@@ -569,6 +595,9 @@ async function handleInternalProxyRequest(request, sourceUrl) {
 self.addEventListener("message", (event) => {
   if (event.data?.kind === "configure-service-worker") {
     addonProxyUrlOverride = event.data.addonProxyUrl || null;
+    if (event.data.debug !== undefined) {
+      swDebugMode = Boolean(event.data.debug);
+    }
     return;
   }
 
@@ -681,7 +710,14 @@ self.addEventListener("fetch", (event) => {
         const cacheKey = new URL(requestPath, url.origin).toString();
         const cached = await scopedCache.match(cacheKey);
         if (cached) {
+          if (swDebugMode) {
+            console.debug(`[sw:asset] cache hit: ${requestPath}`);
+          }
           return cached;
+        }
+
+        if (swDebugMode) {
+          console.debug(`[sw:asset] cache miss, forwarding to PHP worker: ${requestPath}`);
         }
 
         // Cache miss — forward to worker, then cache successful non-HTML responses.
@@ -698,13 +734,19 @@ self.addEventListener("fetch", (event) => {
             scopedCache.put(cacheKey, fresh.clone()).catch(() => {});
             // Evict oldest entries when cache grows too large
             scopedCache.keys().then((keys) => {
-              if (keys.length > 300) {
-                for (let i = 0; i < keys.length - 300; i++) {
+              if (keys.length > 500) {
+                const evictCount = keys.length - 500;
+                if (swDebugMode) {
+                  console.debug(`[sw:asset] evicting ${evictCount} oldest cache entries (total: ${keys.length})`);
+                }
+                for (let i = 0; i < evictCount; i++) {
                   scopedCache.delete(keys[i]).catch(() => {});
                 }
               }
             }).catch(() => {});
           }
+        } else if (swDebugMode) {
+          console.warn(`[sw:asset] PHP worker returned ${fresh.status} for asset: ${requestPath}`);
         }
         return fresh;
       }

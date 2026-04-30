@@ -52,12 +52,40 @@ async function normalizeRequest(requestOrUrl) {
 }
 
 /**
+ * Known Moodle asset-serving PHP scripts that use PATH_INFO.
+ * Listed explicitly so that edge cases (URL encoding, unusual path segments)
+ * always resolve correctly without relying solely on the generic ".php/" split.
+ */
+const KNOWN_ASSET_SCRIPTS = new Set([
+  "/theme/styles.php",
+  "/theme/styles_debug.php",
+  "/lib/javascript.php",
+  "/theme/image.php",
+  "/theme/font.php",
+  "/lib/yui_combo.php",
+  "/pluginfile.php",
+  "/draftfile.php",
+  "/tokenpluginfile.php",
+]);
+
+/**
  * Resolve the PHP script path and PATH_INFO from a URL pathname.
  * Handles directory requests by appending index.php.
  * Handles PATH_INFO (e.g., /theme/styles.php/boost/123/all).
  */
 function resolveScriptPath(pathname, webRoot) {
-  // Check for PATH_INFO: split at ".php/" to find the script and the extra path
+  // Fast path: check known asset scripts first.
+  // This avoids ambiguity from the generic ".php/" matcher when URL encoding
+  // or unusual path segments are involved.
+  for (const script of KNOWN_ASSET_SCRIPTS) {
+    if (pathname.startsWith(script + "/") || pathname === script) {
+      const scriptPath = `${webRoot}${script}`;
+      const pathInfo = pathname.substring(script.length);
+      return { scriptPath, pathInfo };
+    }
+  }
+
+  // General case: split at ".php/" to find the script and the extra path
   const phpIdx = pathname.indexOf(".php/");
   if (phpIdx >= 0) {
     const scriptPath = `${webRoot}${pathname.substring(0, phpIdx + 4)}`;
@@ -181,9 +209,12 @@ export function wrapPhpInstance(
         }
       }
 
-      // Return 404 for PHP scripts that don't exist in the filesystem
+      // Return 404 for PHP scripts that don't exist in the filesystem.
+      // Include the resolved path in the response body to aid debugging
+      // "No input file specified" style errors.
       if (!php.fileExists(scriptPath)) {
-        return new Response("Not Found", { status: 404 });
+        console.warn(`[php-compat] Script not found: ${scriptPath} (pathname=${pathname})`);
+        return new Response(`Script not found: ${scriptPath}`, { status: 404 });
       }
 
       // Build $_SERVER to match what Moodle expects from a CGI environment.
