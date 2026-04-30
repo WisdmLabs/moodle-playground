@@ -203,6 +203,16 @@ Generate shareable URLs from the Share button in the toolbar:
 - **Query parameters** — encodes version selections as URL parameters
 - **GitHub Gist** — exports the blueprint as a GitHub Gist and generates a `?blueprint-url=` link
 
+## Testing
+
+```bash
+make test             # 290+ unit tests (no setup needed beyond npm install)
+make test-e2e-chrome  # Playwright E2E tests in Chromium
+make lint             # Biome linter
+```
+
+First-time E2E setup: `npx playwright install chromium`. See the [development docs](docs/development.md#testing) for the full test suite breakdown, CI pipeline, and manual validation checklist.
+
 ## Documentation
 
 See the [development docs](docs/development.md) and [`AGENTS.md`](AGENTS.md) for the full command reference.

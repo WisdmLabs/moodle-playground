@@ -116,24 +116,111 @@ mkdocs serve
 mkdocs build --strict
 ```
 
-## Tests
+## Testing
 
-### Blueprint tests
+### Quick reference
 
 ```bash
-npm run test:blueprint
+make test           # All unit tests (290+ tests)
+make test-e2e       # Playwright E2E tests (Chromium + Firefox)
+make test-e2e-chrome # E2E in Chromium only
+make test-e2e-firefox # E2E in Firefox only
+make lint           # Biome linter
+make format         # Auto-fix lint and formatting
 ```
 
-Runs 49 unit tests covering the parser, schema validator, constants, resources, executor, resolver, and step registry.
+### Unit tests
 
-## Manual validation
+Unit tests use Node.js built-in `node:test` — no framework to install. Run all of them:
+
+```bash
+make test
+# or
+npm test
+```
+
+You can also run a specific suite:
+
+```bash
+npm run test:blueprint              # Blueprint parser, schema, executor, steps
+node --test tests/runtime/*.test.js # Runtime config, PHP compat, crash recovery
+node --test tests/sw/*.test.js      # Service worker helpers
+node --test tests/mcp/*.test.js     # MCP tools, resources, prompts
+node --test tests/shared/*.test.js  # Version resolver, paths, storage
+```
+
+### Test suites at a glance
+
+| Directory | Tests | What it covers |
+|-----------|-------|---------------|
+| `tests/blueprint/` | 10 files | Parser, schema validator, constants, resources, executor, resolver, step registry, PHP helpers, plugin detection |
+| `tests/runtime/` | 6 files | `config.php` generation, PHP compat layer, crash recovery, manifest, TCP certificates |
+| `tests/shared/` | 6 files | Version resolver, paths, protocol, storage, service worker version, GitHub proxy |
+| `tests/sw/` | 1 file | HTML entity decoding, scoped runtime extraction, URL rewriting |
+| `tests/mcp/` | 4 files | MCP tool definitions, resources, prompts, WebSocket bridge |
+| `tests/e2e/` | 6 files | Full browser tests (shell UI, Moodle boot, blueprints, admin flows, themes, networking) |
+
+### End-to-end tests (Playwright)
+
+E2E tests run against a real browser and verify the full flow: shell boot, WASM PHP runtime, Moodle loading, and blueprint execution.
+
+**First-time setup** — install browser binaries:
+
+```bash
+npx playwright install chromium
+# or for both browsers:
+npx playwright install chromium firefox
+```
+
+**Run E2E tests:**
+
+```bash
+make test-e2e          # Both Chromium and Firefox
+make test-e2e-chrome   # Chromium only (faster)
+make test-e2e-firefox  # Firefox only
+```
+
+The dev server starts automatically on port 8085. If you already have a build (the `assets/manifests/latest.json` file exists), it uses `http-server` directly; otherwise it runs `make up` to build first.
+
+E2E tests are slower (3-minute timeout per test) because they wait for a full WASM Moodle boot. Start with unit tests for fast feedback.
+
+**View the HTML report** after a run:
+
+```bash
+npx playwright show-report
+```
+
+### Linting
+
+```bash
+make lint    # Check for issues
+make format  # Auto-fix
+```
+
+Biome checks `src/`, `tests/`, and `scripts/`. Configuration is in `biome.json`.
+
+### CI pipeline
+
+Every push to `main` and every PR runs the full pipeline automatically:
+
+1. **lint-and-test** — syntax checks + all unit tests + Biome lint
+2. **build** — builds all Moodle branches + docs
+3. **e2e-chromium** and **e2e-firefox** — Playwright E2E in both browsers
+4. **deploy-preview** (PRs only) — Netlify preview URL for manual testing
+5. **deploy-pages** (main only) — deploy to GitHub Pages
+
+A green CI run means: all unit tests pass, all E2E tests pass in both browsers, linting is clean.
+
+### Manual validation checklist
 
 After changes, verify in a real browser:
 
-- First boot install path (every page load is a fresh install)
-- Navigation inside Moodle (caching should make second page loads faster)
-- GitHub Pages subpath behavior
-- Service worker updates after redeploy
+- [ ] First boot completes without redirecting to `admin/index.php` or `upgradesettings.php`
+- [ ] Navigation inside Moodle works (second page loads should be faster due to caching)
+- [ ] GitHub Pages subpath behavior (if touching routing or `sw.js`)
+- [ ] Service worker updates after redeploy (hard reload)
+- [ ] Blueprint execution (if touching blueprint steps)
+- [ ] Plugin install via `/admin/tool/installaddon/index.php` (if touching runtime)
 
 If a change touches routing or HTML rewriting, prefer checking real browser behavior, not only syntax.
 
