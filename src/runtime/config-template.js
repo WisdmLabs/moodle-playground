@@ -64,6 +64,8 @@ $CFG->updateautocheck = false;
 // Display debug messages on page when explicitly enabled for this runtime.
 $CFG->debugdisplay = ${Number(debugdisplay) ? 1 : 0};
 $CFG->showcrondebugging = false;
+$CFG->cronclionly = 0;
+$CFG->cronremotepassword = '';
 // Enable all caching layers — the filesystem is MEMFS (pure memory) so file-backed
 // caches are fast and persist for the lifetime of the worker session.
 // cachejs must stay false: when enabled, Moodle rewrites JS module URLs to serve

@@ -3,6 +3,7 @@ import { createPhpBridgeChannel, createShellChannel } from "./src/shared/protoco
 import { bootstrapMoodle } from "./src/runtime/bootstrap.js";
 import { isFatalWasmError, isEmscriptenNetworkError, isSafeToReplay, formatErrorDetail, createSnapshotManager } from "./src/runtime/crash-recovery.js";
 import { createPhpRuntime, createProvisioningRuntime } from "./src/runtime/php-loader.js";
+import { CronScheduler } from "./src/runtime/cron-scheduler.js";
 import {
   getBranchMetadata,
   resolveRuntimeConfig,
@@ -71,6 +72,15 @@ function postShell(message) {
 }
 
 snapshot = createSnapshotManager({ postShell });
+
+const cronScheduler = new CronScheduler({
+  enabled: false,
+  interval: 60_000,
+  maxRunTime: 30_000,
+  onStatusChange(status) {
+    postShell({ kind: "cron-status", ...status });
+  },
+});
 
 function traceRuntimeSelection(stage, detail) {
   if (!shouldTraceRuntimeSelection({ debug, profile })) {
@@ -591,6 +601,31 @@ async function getRuntimeState() {
       path: bootstrapState.readyPath || activeBlueprint?.landingPage || config.landingPath || "/",
     });
 
+    cronScheduler.setCronExecutor(() => {
+      return new Promise((resolve, reject) => {
+        requestQueue = requestQueue.then(async () => {
+          try {
+            const result = await php.request(
+              new Request("http://localhost:8080/admin/cron.php"),
+            );
+            const text = await result.text();
+            if (result.status !== 200) {
+              throw new Error(`Cron returned HTTP ${result.status}: ${text.slice(0, 200)}`);
+            }
+            resolve();
+          } catch (err) {
+            reject(err);
+          }
+        });
+      });
+    });
+
+    if (config.cron?.enabled) {
+      cronScheduler.interval = config.cron.intervalMs || 60_000;
+      cronScheduler.maxRunTime = config.cron.maxRunTimeMs || 30_000;
+      cronScheduler.start();
+    }
+
     return { php };
   })();
 
@@ -740,8 +775,36 @@ function installBridgeListener() {
   });
 }
 
+function handleCronMessage(data) {
+  switch (data.kind) {
+    case "cron-start":
+      if (data.interval) cronScheduler.setInterval(data.interval);
+      cronScheduler.start();
+      break;
+    case "cron-stop":
+      cronScheduler.stop();
+      break;
+    case "cron-run-now":
+      void cronScheduler.runNow();
+      break;
+    case "cron-status":
+      postShell({ kind: "cron-status", ...cronScheduler.getStatus() });
+      break;
+    case "cron-set-interval":
+      if (data.interval) cronScheduler.setInterval(data.interval);
+      break;
+    default:
+      break;
+  }
+}
+
 function installMessageListener() {
   self.addEventListener("message", (event) => {
+    if (event.data?.kind?.startsWith("cron-")) {
+      handleCronMessage(event.data);
+      return;
+    }
+
     if (event.data?.kind !== "configure-blueprint") {
       if (event.data?.kind === "capture-phpinfo") {
         void publishPhpInfo(activeRuntimeConfig, "manual");

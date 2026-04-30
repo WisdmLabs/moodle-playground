@@ -518,6 +518,78 @@ button.danger:hover {
   gap: var(--space-sm);
 }
 
+/* ── Cron controls ───────────────────────────────── */
+.cron-controls {
+  margin-top: var(--space-xl);
+  padding-top: var(--space-lg);
+  border-top: 1px solid var(--border-light);
+}
+
+.cron-controls__header {
+  margin-bottom: var(--space-md);
+}
+
+.cron-controls__title {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+.cron-controls__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-xs) 0;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.cron-controls__row span:first-child,
+.cron-controls__row label {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.cron-controls__toggle-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  cursor: pointer;
+}
+
+.cron-controls__row select {
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-input);
+  color: var(--text);
+  font-size: 12px;
+}
+
+.cron-controls__actions {
+  margin-top: var(--space-sm);
+}
+
+.cron-controls__actions button {
+  font-size: 12px;
+  padding: 4px 12px;
+}
+
+.cron-status--disabled {
+  color: var(--text-muted) !important;
+}
+
+.cron-status--idle {
+  color: #16a34a !important;
+}
+
+.cron-status--running {
+  color: var(--accent) !important;
+}
+
 /* ── Panel rows (logs/phpinfo/blueprint headers) ──── */
 .panel__row {
   justify-content: space-between;
