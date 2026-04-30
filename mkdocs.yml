@@ -55,6 +55,7 @@ nav:
       - Blueprint reference: blueprint-json.md
       - Blueprint gallery: blueprint-gallery.md
   - Integration:
+      - AI Integration: ai-integration.md
       - JavaScript API: javascript-api.md
       - MCP bridge: mcp-bridge.md
   - Architecture:

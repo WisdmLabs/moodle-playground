@@ -85,5 +85,48 @@ Export the full playground state as a ZIP.
 #### `importSite(zipBuffer: ArrayBuffer): Promise<void>`
 Import a ZIP to restore playground state.
 
+#### `getWebsiteUrl(): Promise<string>`
+Get the base URL of the playground instance.
+
+#### `getSiteInfo(): Promise<object>`
+Get Moodle site metadata (version, name, PHP version).
+
+#### `getCurrentUrl(): Promise<string>`
+Get the current page URL path within Moodle.
+
+#### `resetSite(): Promise<void>`
+Reset the playground to a fresh install state. All data is lost.
+
+#### `saveSite(): Promise<ArrayBuffer>`
+Save the current site state (alias for `exportSite()`).
+
+#### `mkdir(path: string): Promise<void>`
+Create a directory (and parents) in MEMFS.
+
+#### `deleteFile(path: string): Promise<void>`
+Delete a file from MEMFS.
+
+#### `deleteDirectory(path: string): Promise<void>`
+Delete a directory and its contents from MEMFS.
+
+#### `fileExists(path: string): Promise<boolean>`
+Check whether a file or directory exists in MEMFS.
+
+#### `applyBlueprint(blueprint: object): Promise<void>`
+Apply a blueprint JSON to configure the running instance.
+
+#### `getBlueprint(): Promise<object>`
+Get the currently active blueprint configuration.
+
+#### `setConfig(name: string, value: string, plugin?: string): Promise<void>`
+Set a Moodle configuration value. Pass `plugin` for plugin-scoped settings.
+
+#### `installPlugin(url: string, pluginType?: string, pluginName?: string): Promise<void>`
+Install a Moodle plugin from a GitHub ZIP URL. Plugin type and name are
+auto-detected if not provided.
+
+#### `listSites(): Promise<object[]>`
+List all active playground instances.
+
 #### `destroy(): void`
 Clean up event listeners and disconnect from the iframe.

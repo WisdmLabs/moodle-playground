@@ -133,9 +133,9 @@ See the [Architecture overview](architecture.md) for the full picture.
 
     `@moodle-playground/client` for programmatic control.
 
-- :material-robot: **MCP bridge**
+- :material-robot: **AI agent integration**
 
-    AI agents can control the playground via postMessage.
+    MCP server with 21 tools, resources, prompts, and agent skills for Claude, Cursor, and Copilot.
 
 </div>
 
@@ -166,6 +166,10 @@ See the [Architecture overview](architecture.md) for the full picture.
 - :material-export: **[Site export & import](site-export-import.md)**
 
     Snapshot and restore playground state.
+
+- :material-robot: **[AI Integration](ai-integration.md)**
+
+    MCP server setup, tools, resources, and agent skills.
 
 - :material-sitemap: **[Architecture](architecture.md)**
 

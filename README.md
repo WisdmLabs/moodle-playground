@@ -20,7 +20,7 @@ Moodle Playground runs [Moodle](https://moodle.org) entirely in the browser usin
 - **Site export / import** — snapshot the full playground state as a ZIP and restore it later
 - **Shareable URLs** — share blueprint links or GitHub Gists with one click
 - **JavaScript client library** — `@moodle-playground/client` for programmatic control
-- **MCP bridge** — AI agents can control the playground via postMessage
+- **AI agent integration** — MCP server with 21 tools, resources, prompts, and agent skills for Claude, Cursor, and Copilot
 - **Crash recovery** — automatic runtime restart with state preservation on WASM OOM
 - **Multiple Moodle versions** — 4.4, 4.5, 5.0, and more built in parallel
 
@@ -176,6 +176,24 @@ await playground.navigate('/course/view.php?id=2');
 ```
 
 See the [Embedding guide](docs/embedding.md), [JavaScript API reference](docs/javascript-api.md), and [MCP bridge docs](docs/mcp-bridge.md).
+
+## AI Agent Integration
+
+Control the playground from AI coding assistants via the MCP server:
+
+```bash
+# Start the MCP server
+npx @moodle-playground/mcp-server
+
+# Add to Claude Code
+claude mcp add --transport stdio --scope user \
+  moodle-playground -- npx -y @moodle-playground/mcp-server
+
+# Install agent skills
+npx @moodle-playground/agent-skills --agent claude --global
+```
+
+21 tools, 7 resources, and 5 prompts for navigating, executing PHP, managing files, installing plugins, and more. See the [AI Integration guide](docs/ai-integration.md).
 
 ## Sharing
 
