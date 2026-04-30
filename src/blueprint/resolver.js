@@ -4,15 +4,43 @@ import { validateBlueprint } from "./schema.js";
 import { saveBlueprint } from "./storage.js";
 
 /**
+ * Resolve a blueprint from the URL hash/fragment.
+ *
+ * Supports two encodings:
+ *   - Raw JSON (URL-encoded or plain)
+ *   - Base64-encoded JSON (with encodeURIComponent inside btoa)
+ *
+ * @param {Location} loc - Location object to read the hash from.
+ * @returns {object|null} Parsed blueprint, or null if the hash is empty/invalid.
+ */
+function resolveFromFragment(loc) {
+  const hash = loc.hash?.slice(1);
+  if (!hash) return null;
+
+  try {
+    return JSON.parse(decodeURIComponent(hash));
+  } catch {
+    try {
+      const json = decodeURIComponent(escape(atob(hash)));
+      return JSON.parse(json);
+    } catch {
+      return null;
+    }
+  }
+}
+
+/**
  * Resolve the active blueprint from multiple sources in priority order.
  *
  * Precedence:
- *   1. ?blueprint= query param (inline JSON / base64 / data-URL)
- *   2. ?blueprint-url= query param (remote URL)
- *   3. Query param shortcuts (?plugin=, ?theme=, ?url=, ?lang=)
- *   4. sessionStorage
- *   5. defaultBlueprintUrl (fetch)
- *   6. Built-in minimal default
+ *   1. URL hash/fragment (base64 or JSON-encoded blueprint)
+ *   2. ?blueprint= query param (inline JSON / base64 / data-URL)
+ *   3. ?blueprint-url= query param (remote URL)
+ *   4. Query param shortcuts (?plugin=, ?theme=, ?url=, ?lang=)
+ *   5. ?import-site= (deferred - handled by worker after runtime boot)
+ *   6. sessionStorage
+ *   7. defaultBlueprintUrl (fetch)
+ *   8. Built-in minimal default
  *
  * @param {{ scopeId: string, location?: Location, defaultBlueprintUrl?: string }} options
  * @returns {Promise<object>} Resolved blueprint object.
@@ -25,10 +53,20 @@ export async function resolveBlueprint({
   const loc =
     location || (typeof window !== "undefined" ? window.location : null);
 
+  // 1. URL hash/fragment (base64 or JSON-encoded blueprint)
+  if (loc) {
+    const fragmentBlueprint = resolveFromFragment(loc);
+    if (fragmentBlueprint) {
+      console.log("[blueprint] Resolved from URL fragment.");
+      saveBlueprint(scopeId, fragmentBlueprint);
+      return fragmentBlueprint;
+    }
+  }
+
   if (loc) {
     const url = new URL(loc.href);
 
-    // 1. ?blueprint= (inline)
+    // 2. ?blueprint= (inline)
     const blueprintParam = url.searchParams.get("blueprint");
     if (blueprintParam) {
       try {
@@ -44,7 +82,7 @@ export async function resolveBlueprint({
       }
     }
 
-    // 2. ?blueprint-url= (remote)
+    // 3. ?blueprint-url= (remote)
     const blueprintUrlParam = url.searchParams.get("blueprint-url");
     if (blueprintUrlParam) {
       try {
@@ -82,7 +120,7 @@ export async function resolveBlueprint({
     }
   }
 
-  // 3. Query param shortcuts (?plugin=, ?theme=, ?url=, ?lang=)
+  // 4. Query param shortcuts (?plugin=, ?theme=, ?url=, ?lang=)
   if (loc) {
     const queryParams = parseQueryParams(loc);
     const paramBlueprint = buildBlueprintFromParams(queryParams);
@@ -93,11 +131,27 @@ export async function resolveBlueprint({
     }
   }
 
-  // 4. sessionStorage blueprints are not reloaded on bare URL navigations —
+  // 5. ?import-site= (deferred - handled by worker after runtime boot)
+  if (loc) {
+    const importSiteUrl = new URL(loc.href).searchParams.get("import-site");
+    if (importSiteUrl) {
+      console.log("[blueprint] import-site= detected, using minimal blueprint for boot.");
+      const minimal = {
+        landingPage: "/",
+        preferredVersions: { php: "8.3", moodle: "5.0" },
+        steps: [{ step: "installMoodle" }],
+        _importSiteUrl: importSiteUrl,
+      };
+      saveBlueprint(scopeId, minimal);
+      return minimal;
+    }
+  }
+
+  // 6. sessionStorage blueprints are not reloaded on bare URL navigations —
   //    the ephemeral runtime should boot clean. Blueprints from ?blueprint=
   //    params are returned above before reaching this point.
 
-  // 5. defaultBlueprintUrl
+  // 7. defaultBlueprintUrl
   if (defaultBlueprintUrl) {
     try {
       const base = loc ? loc.href : undefined;
@@ -125,7 +179,7 @@ export async function resolveBlueprint({
     }
   }
 
-  // 6. Built-in minimal default
+  // 8. Built-in minimal default
   console.log("[blueprint] Using built-in default.");
   const fallback = buildMinimalDefault();
   saveBlueprint(scopeId, fallback);

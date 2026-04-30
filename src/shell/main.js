@@ -75,6 +75,12 @@ const els = {
   persistenceStatus: document.querySelector("#persistence-status"),
   exportSiteButton: document.querySelector("#export-site-button"),
   importSiteInput: document.querySelector("#import-site-input"),
+  shareButton: document.querySelector("#share-button"),
+  sharePopover: document.querySelector("#share-popover"),
+  shareOverlay: document.querySelector("#share-overlay"),
+  shareUrlInput: document.querySelector("#share-url-input"),
+  shareCopyButton: document.querySelector("#share-copy-button"),
+  shareCloseButton: document.querySelector("#share-close-button"),
 };
 
 const scopeId = getOrCreateScopeId();
@@ -825,6 +831,44 @@ function showLazySplash() {
   viewport.append(splash);
 }
 
+function openSharePopover() {
+  if (!els.sharePopover) return;
+  updateShareUrl();
+  els.sharePopover.classList.add("is-open");
+  els.shareOverlay.classList.add("is-open");
+  els.shareOverlay.setAttribute("aria-hidden", "false");
+}
+
+function closeSharePopover() {
+  if (!els.sharePopover) return;
+  els.sharePopover.classList.remove("is-open");
+  els.shareOverlay.classList.remove("is-open");
+  els.shareOverlay.setAttribute("aria-hidden", "true");
+}
+
+function updateShareUrl() {
+  if (!els.shareUrlInput) return;
+  const shareType = document.querySelector('input[name="share-type"]:checked')?.value || "blueprint";
+  const baseUrl = new URL(window.location.href);
+  baseUrl.search = "";
+  baseUrl.hash = "";
+
+  if (shareType === "blueprint" && activeBlueprint) {
+    const json = JSON.stringify(activeBlueprint);
+    const encoded = btoa(unescape(encodeURIComponent(json)));
+    baseUrl.hash = encoded;
+    els.shareUrlInput.value = baseUrl.toString();
+  } else {
+    // Query params mode
+    if (currentMoodleBranch) {
+      const meta = MOODLE_BRANCHES.find(b => b.branch === currentMoodleBranch);
+      if (meta) baseUrl.searchParams.set("moodle", meta.version);
+    }
+    if (currentPhpVersion) baseUrl.searchParams.set("php", currentPhpVersion);
+    els.shareUrlInput.value = baseUrl.toString();
+  }
+}
+
 async function main() {
   config = await loadPlaygroundConfig();
 
@@ -904,15 +948,48 @@ async function main() {
     });
   }
 
-  // Close popover on Escape
+  // Close popovers on Escape
   document.addEventListener("keydown", (event) => {
-    if (
-      event.key === "Escape" &&
-      els.settingsPopover?.classList.contains("is-open")
-    ) {
-      closeSettingsPopover();
+    if (event.key === "Escape") {
+      if (els.sharePopover?.classList.contains("is-open")) {
+        closeSharePopover();
+      }
+      if (els.settingsPopover?.classList.contains("is-open")) {
+        closeSettingsPopover();
+      }
     }
   });
+
+  // Share popover event listeners
+  if (els.shareButton) {
+    els.shareButton.addEventListener("click", () => {
+      const isOpen = els.sharePopover?.classList.contains("is-open");
+      if (isOpen) closeSharePopover();
+      else openSharePopover();
+    });
+  }
+  if (els.shareOverlay) {
+    els.shareOverlay.addEventListener("click", closeSharePopover);
+  }
+  if (els.shareCloseButton) {
+    els.shareCloseButton.addEventListener("click", closeSharePopover);
+  }
+  if (els.shareCopyButton) {
+    els.shareCopyButton.addEventListener("click", () => {
+      if (els.shareUrlInput?.value) {
+        navigator.clipboard.writeText(els.shareUrlInput.value).then(() => {
+          const orig = els.shareCopyButton.textContent;
+          els.shareCopyButton.textContent = "Copied!";
+          setTimeout(() => { els.shareCopyButton.textContent = orig; }, 1200);
+        });
+      }
+    });
+  }
+
+  // Update share URL when radio selection changes
+  for (const radio of document.querySelectorAll('input[name="share-type"]')) {
+    radio.addEventListener("change", updateShareUrl);
+  }
 
   bindShellChannel();
   bindServiceWorkerMessages();
