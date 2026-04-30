@@ -153,6 +153,42 @@
               <span>Runtime ID</span>
               <span id="current-runtime-label" class="settings-value">-</span>
             </div>
+            <div class="cron-controls">
+              <div class="cron-controls__header">
+                <span class="cron-controls__title">Cron Scheduler</span>
+              </div>
+              <div class="cron-controls__row">
+                <label class="cron-controls__toggle-label" for="cron-toggle">
+                  <span>Enable cron</span>
+                  <input type="checkbox" id="cron-toggle">
+                </label>
+              </div>
+              <div class="cron-controls__row">
+                <span>Status</span>
+                <span id="cron-status" class="settings-value cron-status--disabled">Disabled</span>
+              </div>
+              <div class="cron-controls__row">
+                <span>Last run</span>
+                <span id="cron-last-run" class="settings-value">Never</span>
+              </div>
+              <div class="cron-controls__row">
+                <span>Run count</span>
+                <span id="cron-run-count" class="settings-value">0</span>
+              </div>
+              <div class="cron-controls__row">
+                <label for="cron-interval">Interval</label>
+                <select id="cron-interval">
+                  <option value="30000">30s</option>
+                  <option value="60000" selected>60s</option>
+                  <option value="120000">2 min</option>
+                  <option value="300000">5 min</option>
+                </select>
+              </div>
+              <div class="cron-controls__actions">
+                <button type="button" id="cron-run-now" disabled>Run Now</button>
+              </div>
+            </div>
+
             <div class="settings-actions">
               <button type="button" id="reset-button" class="danger">Reset Playground</button>
             </div>

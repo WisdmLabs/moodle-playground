@@ -55,6 +55,12 @@ const els = {
   currentMoodleLabel: document.querySelector("#current-moodle-label"),
   currentPhpLabel: document.querySelector("#current-php-label"),
   currentRuntimeLabel: document.querySelector("#current-runtime-label"),
+  cronToggle: document.querySelector("#cron-toggle"),
+  cronStatus: document.querySelector("#cron-status"),
+  cronLastRun: document.querySelector("#cron-last-run"),
+  cronRunNow: document.querySelector("#cron-run-now"),
+  cronInterval: document.querySelector("#cron-interval"),
+  cronRunCount: document.querySelector("#cron-run-count"),
   infoPanel: document.querySelector("#info-panel"),
   infoTab: document.querySelector("#info-tab"),
   sidePanel: document.querySelector("#side-panel"),
@@ -285,6 +291,41 @@ function capturePhpInfoViaWorker(reason = "manual") {
   }
 }
 
+function postCronMessage(message) {
+  if (els.frame?.contentWindow) {
+    els.frame.contentWindow.postMessage(message, "*");
+  }
+}
+
+function updateCronUi(status) {
+  if (els.cronToggle) {
+    els.cronToggle.checked = status.enabled;
+  }
+  if (els.cronStatus) {
+    if (!status.enabled) {
+      els.cronStatus.textContent = "Disabled";
+      els.cronStatus.className = "settings-value cron-status--disabled";
+    } else if (status.running) {
+      els.cronStatus.textContent = "Running...";
+      els.cronStatus.className = "settings-value cron-status--running";
+    } else {
+      els.cronStatus.textContent = "Idle";
+      els.cronStatus.className = "settings-value cron-status--idle";
+    }
+  }
+  if (els.cronLastRun) {
+    els.cronLastRun.textContent = status.lastRun
+      ? new Date(status.lastRun).toLocaleTimeString()
+      : "Never";
+  }
+  if (els.cronRunCount) {
+    els.cronRunCount.textContent = String(status.runCount || 0);
+  }
+  if (els.cronRunNow) {
+    els.cronRunNow.disabled = uiLocked || status.running;
+  }
+}
+
 function setActivePanel(panel) {
   const panels = {
     phpinfo: [els.phpInfoPanel, els.phpInfoTab],
@@ -432,6 +473,9 @@ function bindShellChannel() {
       case "phpinfo":
         setPhpInfoContent(message.html || "");
         appendLog(message.detail || "Captured PHP runtime diagnostics.");
+        break;
+      case "cron-status":
+        updateCronUi(message);
         break;
       case "trace":
         appendLog(message.detail || "[trace]");
@@ -678,6 +722,27 @@ els.copyLogs.addEventListener("click", () => {
   });
 });
 els.refreshPhpInfoButton.addEventListener("click", requestPhpInfoCapture);
+
+if (els.cronToggle) {
+  els.cronToggle.addEventListener("change", () => {
+    postCronMessage({
+      kind: els.cronToggle.checked ? "cron-start" : "cron-stop",
+    });
+  });
+}
+if (els.cronRunNow) {
+  els.cronRunNow.addEventListener("click", () => {
+    postCronMessage({ kind: "cron-run-now" });
+  });
+}
+if (els.cronInterval) {
+  els.cronInterval.addEventListener("change", () => {
+    const ms = Number(els.cronInterval.value);
+    if (ms > 0) {
+      postCronMessage({ kind: "cron-set-interval", interval: ms });
+    }
+  });
+}
 
 els.addressForm.addEventListener("submit", (event) => {
   event.preventDefault();

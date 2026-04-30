@@ -18,6 +18,11 @@
     "password": "password",
     "email": "admin@example.com"
   },
+  "cron": {
+    "enabled": false,
+    "intervalMs": 60000,
+    "maxRunTimeMs": 30000
+  },
   "runtimes": [
     {
       "id": "php83-moodle50",

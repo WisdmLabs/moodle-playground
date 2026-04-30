@@ -490,6 +490,11 @@ function bindShellCommands(scopeId, runtimeId) {
         scopeId,
         runtimeId,
       });
+      return;
+    }
+
+    if (message?.kind?.startsWith("cron-")) {
+      phpWorker?.postMessage(message);
     }
   });
 }
