@@ -1,21 +1,42 @@
 # AI Integration
 
-Moodle Playground provides first-class AI agent integration through the
-**Model Context Protocol (MCP)**, a **JavaScript client library**, and
-**publishable agent skills**.
+Moodle Playground can be controlled by AI coding assistants like **Claude Code**,
+**Cursor**, and **GitHub Copilot**. This means you can ask your AI assistant to
+create courses, install plugins, write PHP code, and manage your playground
+instance — all through natural language.
 
-## Overview
+This works through the **Model Context Protocol (MCP)**, an open standard that
+lets AI tools connect to external services. You don't need to understand MCP to
+use it — just install the server, connect your AI tool, and start asking.
+
+## What can the AI do?
+
+Once connected, your AI assistant can:
+
+- **Create courses and users** — "Create a course called Physics 101 with 5 sections"
+- **Install plugins** — "Install the subcourse activity from moodlehq on GitHub"
+- **Write and test PHP** — "Run PHP to check the Moodle version"
+- **Manage files** — "Write a local plugin that adds a greeting page"
+- **Configure settings** — "Enable developer debug mode"
+- **Export/import state** — "Save this playground so I can restore it later"
+
+## How it works
 
 ```text
-AI Agent (Claude, Cursor, Copilot)
-  |  stdio
-  v
-@moodle-playground/mcp   (Node.js MCP server)
-  |  WebSocket (localhost)
-  v
-Browser — Moodle Playground
-  remote.html -> worker -> PHP WASM
+You  -->  AI Assistant (Claude, Cursor, Copilot)
+            |  (stdio)
+            v
+          MCP Server  (@moodle-playground/mcp-server)
+            |  (WebSocket on localhost)
+            v
+          Browser tab running Moodle Playground
+            |
+            v
+          PHP/Moodle in WebAssembly
 ```
+
+The MCP server is a small program that runs on your computer. Your AI tool talks
+to it, and it forwards commands to the Moodle Playground running in your browser.
 
 ## Getting Started
 
@@ -25,8 +46,8 @@ Browser — Moodle Playground
 npx @moodle-playground/mcp-server
 ```
 
-This starts a stdio-based MCP server and opens the playground in your browser.
-The server bridges tool calls to the running playground via WebSocket.
+This starts the MCP server and opens the playground in your browser automatically.
+The server bridges commands from your AI tool to the running playground.
 
 ### 2. Connect your AI tool
 
@@ -87,6 +108,30 @@ Agent skills provide context and reference documentation to your AI tool:
 ```bash
 npx @moodle-playground/agent-skills --agent claude --global
 ```
+
+## Example: Your first AI-powered session
+
+After setup, try these in your AI assistant:
+
+!!! example "Create a demo course"
+    > "Create a course called 'Introduction to AI' with shortname AI101,
+    > create a student user, and enroll them."
+
+    The AI will use `moodle/runPhp` to call Moodle's `create_course()` API,
+    create a user, and set up enrollment — all automatically.
+
+!!! example "Install and test a plugin"
+    > "Install the subcourse plugin from moodlehq on GitHub and create a
+    > course that uses it."
+
+    The AI will use `moodle/installPlugin` with the GitHub ZIP URL, then
+    navigate to `/admin/index.php` to complete the upgrade.
+
+!!! example "Debug a problem"
+    > "Enable debug mode and check what plugins are installed."
+
+    The AI will use `moodle/setConfig` to enable developer debugging, then
+    use `moodle/runPhp` to query `core_plugin_manager`.
 
 ## MCP Tools
 

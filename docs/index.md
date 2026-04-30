@@ -169,7 +169,7 @@ See the [Architecture overview](architecture.md) for the full picture.
 
 - :material-robot: **[AI Integration](ai-integration.md)**
 
-    MCP server setup, tools, resources, and agent skills.
+    Let Claude, Cursor, or Copilot control the playground for you.
 
 - :material-sitemap: **[Architecture](architecture.md)**
 

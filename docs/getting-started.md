@@ -200,8 +200,21 @@ http://localhost:8080/?blueprint-url=/path/to/demo.blueprint.json
 | `assets/blueprints/default.blueprint.json` | The default blueprint loaded when no URL override is given. |
 | `assets/blueprints/examples/`              | Example blueprints shipped with the project. |
 
+## AI assistant integration
+
+Control the playground from Claude Code, Cursor, or other AI tools:
+
+```bash
+npx @moodle-playground/mcp-server
+```
+
+This connects your AI assistant to the playground so you can ask it to create
+courses, install plugins, and manage Moodle — all through natural language.
+See the [AI Integration guide](ai-integration.md) for setup details.
+
 ## Next steps
 
+- :material-robot: Connect an [AI assistant](ai-integration.md)
 - :material-code-braces: Read the full [Blueprint reference](blueprint-json.md)
 - :material-image-multiple: Browse the [Blueprint gallery](blueprint-gallery.md)
 - :material-sitemap: Understand the [Architecture](architecture.md)
