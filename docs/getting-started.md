@@ -119,16 +119,46 @@ Preview at <http://localhost:8000>. The dev server auto-reloads on every edit.
 
 ## Configuration via URL parameters
 
-The playground accepts URL parameters to select Moodle and PHP versions, or to load a blueprint at boot:
+The playground accepts URL parameters for version selection, blueprint loading, plugin installation, and display modes:
+
+### Version & blueprint
 
 | Parameter       | Example                                  | Description |
 |-----------------|------------------------------------------|-------------|
 | `moodle`        | `?moodle=4.4`                            | Moodle branch to load. |
 | `php`           | `?php=8.3`                               | PHP version to boot. |
 | `blueprint`     | `?blueprint=<json-or-base64>`            | Inline blueprint (JSON, base64, or `data:` URL). |
-| `blueprint-url` | `?blueprint-url=/path/to/blueprint.json` | Load a remote or local blueprint file. |
+| `blueprint-url` | `?blueprint-url=/path/to/blueprint.json` | Load a remote or local blueprint file. Supports ZIP bundles. |
 
-These parameters are also exposed as controls in the Settings panel of the UI.
+### Quick setup shortcuts
+
+These parameters auto-generate a blueprint — no JSON file needed:
+
+| Parameter       | Example                                  | Description |
+|-----------------|------------------------------------------|-------------|
+| `plugin`        | `?plugin=mod_board`                      | Install a plugin (repeatable: `?plugin=mod_board&plugin=block_participants`). |
+| `theme`         | `?theme=moove`                           | Install and activate a theme. |
+| `lang`          | `?lang=es`                               | Set the site default language. Also accepts `language`. |
+| `url`           | `?url=/course/view.php?id=2`             | Set the landing page after boot. |
+| `login`         | `?login=no`                              | Skip the automatic admin login. |
+
+### Display modes
+
+| Parameter       | Example                                  | Description |
+|-----------------|------------------------------------------|-------------|
+| `mode`          | `?mode=seamless`                         | Hide the toolbar and sidebar for embedding. |
+| `lazy`          | `?lazy=true`                             | Show a splash screen; defer boot until the user clicks Start. |
+
+### Advanced
+
+| Parameter       | Example                                  | Description |
+|-----------------|------------------------------------------|-------------|
+| `import-site`   | `?import-site=https://example.com/site.zip` | Import a site ZIP at boot. |
+| `moodle-pr`     | `?moodle-pr=12345`                       | Boot with a Moodle core pull request applied. |
+| `mcp`           | `?mcp=yes`                               | Enable the MCP bridge for AI agent control. |
+| `debug`         | `?debug=true`                            | Force developer debug mode for this boot. |
+
+All parameters can be combined freely. Version and blueprint parameters are also exposed as controls in the Settings panel.
 
 ## First blueprint
 

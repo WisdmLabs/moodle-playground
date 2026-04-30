@@ -47,11 +47,16 @@ nav:
   - Home: index.md
   - User guide:
       - Getting started: getting-started.md
+      - Embedding: embedding.md
+      - Site export & import: site-export-import.md
       - Troubleshooting: TROUBLESHOOTING.md
       - Known issues: KNOWN-ISSUES.md
   - Blueprints:
       - Blueprint reference: blueprint-json.md
       - Blueprint gallery: blueprint-gallery.md
+  - Integration:
+      - JavaScript API: javascript-api.md
+      - MCP bridge: mcp-bridge.md
   - Architecture:
       - Overview: architecture.md
       - Implementation status: implementation-status.md

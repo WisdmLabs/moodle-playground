@@ -10,6 +10,20 @@
 
 Moodle Playground runs [Moodle](https://moodle.org) entirely in the browser using WebAssembly, powered by [WordPress Playground](https://github.com/WordPress/wordpress-playground)'s `@php-wasm/web` runtime. Every page load boots a fresh Moodle instance with a pre-built SQLite snapshot — nothing is stored on disk and nothing leaves your browser.
 
+## Features
+
+- **Browser-native** — runs entirely in-browser via WebAssembly; no server, no Docker
+- **Ephemeral** — every tab gets a fresh Moodle; closing it destroys all state
+- **Blueprints** — step-based JSON to provision users, courses, plugins, themes, and more
+- **URL shortcuts** — install plugins, set themes, change language, and navigate via query params
+- **Seamless & lazy modes** — embed as a borderless iframe or defer boot until the user clicks
+- **Site export / import** — snapshot the full playground state as a ZIP and restore it later
+- **Shareable URLs** — share blueprint links or GitHub Gists with one click
+- **JavaScript client library** — `@moodle-playground/client` for programmatic control
+- **MCP bridge** — AI agents can control the playground via postMessage
+- **Crash recovery** — automatic runtime restart with state preservation on WASM OOM
+- **Multiple Moodle versions** — 4.4, 4.5, 5.0, and more built in parallel
+
 ## Getting Started
 
 ### Try it online
@@ -58,6 +72,29 @@ index.html          Shell UI (toolbar, address bar, log panel)
 
 All state lives in memory (Emscripten MEMFS). Closing the tab destroys everything. This is intentional — the playground is meant for exploration, demos, and testing, not for storing data.
 
+## URL Parameters
+
+Configure the playground via query parameters — no blueprint file needed for common setups.
+
+| Parameter | Description | Example |
+|-----------|-------------|---------|
+| `moodle` | Moodle version | `?moodle=5.0` |
+| `php` | PHP version | `?php=8.3` |
+| `plugin` | Install a plugin (repeatable) | `?plugin=mod_board` |
+| `theme` | Set active theme | `?theme=moove` |
+| `lang` | Site language | `?lang=es` |
+| `url` | Landing page path | `?url=/course/view.php?id=2` |
+| `mode` | Display mode (`seamless` hides UI) | `?mode=seamless` |
+| `lazy` | Defer boot until user clicks | `?lazy=true` |
+| `login` | Skip auto-login | `?login=no` |
+| `blueprint` | Inline blueprint (JSON or base64) | `?blueprint=eyJz...` |
+| `blueprint-url` | Remote blueprint URL (supports ZIP bundles) | `?blueprint-url=https://...` |
+| `import-site` | Import a site ZIP on boot | `?import-site=https://...` |
+| `moodle-pr` | Test a Moodle core PR | `?moodle-pr=12345` |
+| `mcp` | Enable MCP bridge | `?mcp=yes` |
+
+Combine them freely: `?plugin=mod_board&theme=moove&lang=es&url=/course/view.php?id=2`
+
 ## Blueprints
 
 Blueprints are step-based JSON files that configure and provision a playground instance at boot. Inspired by [WordPress Playground Blueprints](https://wordpress.github.io/wordpress-playground/), they use Moodle-native naming and semantics.
@@ -78,6 +115,7 @@ Blueprints are step-based JSON files that configure and provision a playground i
 A default blueprint is bundled at [`assets/blueprints/default.blueprint.json`](assets/blueprints/default.blueprint.json). Override it by:
 
 - Passing `?blueprint=<inline-json-or-base64>` or `?blueprint-url=<url>` in the URL
+- Encoding a blueprint in the URL hash fragment (`#base64-encoded-json`)
 - Importing a `.json` file from the shell toolbar
 
 Blueprints can provision:
@@ -91,6 +129,9 @@ Blueprints can provision:
 - Course modules (`addModule` — label, assign, folder, etc.)
 - Plugins and themes from ZIP URLs (`installMoodlePlugin`, `installTheme`)
 - Moodle config values (`setConfig`, `setConfigs`)
+- Language and config constants (`setSiteLanguage`, `defineConfigConstants`)
+- Database operations (`runSql`, `runSqlFile`, `resetData`)
+- Course backup restore (`restoreCourseBackup`)
 - Filesystem operations (`writeFile`, `mkdir`, `unzip`, etc.)
 - Arbitrary PHP code (`runPhpCode`, `runPhpScript`)
 
@@ -99,6 +140,52 @@ Use `constants` for `{{PLACEHOLDER}}` substitution and `resources` for named fil
 See the [Blueprint reference](docs/blueprint-json.md) for the full format, all step types, and examples. A sample blueprint is at [`blueprint-sample.json`](blueprint-sample.json).
 
 Schema: [`assets/blueprints/blueprint-schema.json`](assets/blueprints/blueprint-schema.json).
+
+## Site Export & Import
+
+Snapshot the entire playground state (database, uploaded files, installed plugins) as a ZIP file and restore it later or share it with others.
+
+- **Export**: Click the Export button in the info panel or use `playground.exportSite()` from the client library
+- **Import**: Click the Import button or load a ZIP via `?import-site=<url>` in the URL
+- **Format**: Standard ZIP containing `database/`, `filedir/`, `plugins/`, and a `playground.json` manifest
+
+## Embedding & Client Library
+
+Embed a Moodle Playground in any web page using an iframe:
+
+```html
+<iframe
+  src="https://moodle-playground.com/?mode=seamless"
+  style="width: 100%; height: 600px; border: none;"
+></iframe>
+```
+
+For programmatic control, use the JavaScript client library:
+
+```javascript
+import { startMoodlePlayground } from '@moodle-playground/client';
+
+const playground = await startMoodlePlayground(iframe, {
+  moodleVersion: '5.0',
+  phpVersion: '8.3',
+  mode: 'seamless',
+});
+
+await playground.isReady();
+await playground.navigate('/course/view.php?id=2');
+```
+
+See the [Embedding guide](docs/embedding.md), [JavaScript API reference](docs/javascript-api.md), and [MCP bridge docs](docs/mcp-bridge.md).
+
+## Sharing
+
+Generate shareable URLs from the Share button in the toolbar:
+
+- **Blueprint URL** — encodes the active blueprint in the URL hash (lightweight, no state)
+- **Query parameters** — encodes version selections as URL parameters
+- **GitHub Gist** — exports the blueprint as a GitHub Gist and generates a `?blueprint-url=` link
+
+## Documentation
 
 See the [development docs](docs/development.md) and [`AGENTS.md`](AGENTS.md) for the full command reference.
 

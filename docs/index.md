@@ -113,6 +113,30 @@ See the [Architecture overview](architecture.md) for the full picture.
 
     Subpath-aware; deployable as a static site.
 
+- :material-puzzle: **URL shortcuts**
+
+    Install plugins, set themes, change language — all via query parameters.
+
+- :material-export: **Site export & import**
+
+    Snapshot the full state as a ZIP and restore it later.
+
+- :material-monitor: **Seamless & lazy modes**
+
+    Embed as a borderless iframe or defer boot until the user clicks.
+
+- :material-share-variant: **Shareable URLs & Gists**
+
+    Share blueprints via URL hash or GitHub Gist with one click.
+
+- :material-code-tags: **JavaScript client library**
+
+    `@moodle-playground/client` for programmatic control.
+
+- :material-robot: **MCP bridge**
+
+    AI agents can control the playground via postMessage.
+
 </div>
 
 ## Where to go next
@@ -130,6 +154,18 @@ See the [Architecture overview](architecture.md) for the full picture.
 - :material-image-multiple: **[Blueprint gallery](blueprint-gallery.md)**
 
     Ready-to-use blueprint examples for courses, users, plugins.
+
+- :material-monitor: **[Embedding](embedding.md)**
+
+    Embed a playground in any website with an iframe.
+
+- :material-code-tags: **[JavaScript API](javascript-api.md)**
+
+    Programmatic control via the client library.
+
+- :material-export: **[Site export & import](site-export-import.md)**
+
+    Snapshot and restore playground state.
 
 - :material-sitemap: **[Architecture](architecture.md)**
 

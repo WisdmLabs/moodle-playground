@@ -56,6 +56,28 @@ The URL base path must be consistent across the entire stack for subpath deploym
 2. **Scoped runtime routing** — routes `/playground/<scope>/<runtime>/...` requests to the PHP worker
 3. **HTML rewriting** — rewrites Moodle-generated links and redirects for the correct subpath
 
+## Site export & import
+
+Although the runtime is ephemeral, the playground supports exporting and importing the full
+site state as a ZIP file. This enables sharing preconfigured environments without blueprints.
+
+The export/import flow uses `src/persistence/`:
+
+- `snapshot.js` — collects the database file, uploaded files, and installed plugins from MEMFS
+- `export.js` — packs the snapshot into a ZIP using fflate
+- `import.js` — unpacks a ZIP and writes files back into MEMFS
+
+The ZIP format contains:
+
+| Path | Contents |
+|------|----------|
+| `database/` | SQLite database file |
+| `filedir/` | Moodle file storage (`moodledata/filedir`) |
+| `plugins/` | Third-party plugins installed via blueprint or manual upload |
+| `playground.json` | Manifest with version info and metadata |
+
+Export/import messages flow through the BroadcastChannel bridge (shell → worker → MEMFS).
+
 ## Install snapshot
 
 A pre-built install snapshot (`assets/moodle/snapshot/install.sq3`) is generated at build time by `scripts/generate-install-snapshot.sh`. At runtime, `bootstrap.js` fetches this snapshot and writes it to MEMFS, then updates `wwwroot` in `mdl_config` to match the deployment URL. This eliminates the 3-8s CLI install phase.

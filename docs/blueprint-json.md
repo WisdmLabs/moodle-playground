@@ -23,15 +23,25 @@ step-based JSON format inspired by WordPress Playground Blueprints.
 
 ## Blueprint Sources
 
-Blueprints can be loaded from:
+Blueprints can be loaded from (checked in this order):
 
-| Source | Example |
-|--------|---------|
-| `?blueprint=` query param | Inline JSON, base64-encoded JSON, or `data:` URL |
-| `?blueprint-url=` query param | URL to a remote `.blueprint.json` file |
-| sessionStorage | Persisted from a previous load in the same tab |
-| Default blueprint URL | Configured in `playground.config.json` |
-| Built-in default | Minimal install + login |
+| Priority | Source | Example |
+|----------|--------|---------|
+| 1 | URL hash fragment | `#base64-encoded-json` or `#{"steps":[...]}` |
+| 2 | `?blueprint=` query param | Inline JSON, base64-encoded JSON, or `data:` URL |
+| 3 | `?blueprint-url=` query param | URL to a `.blueprint.json` file or a ZIP bundle |
+| 4 | Query param shortcuts | `?plugin=mod_board&theme=moove&lang=es` |
+| 5 | `?moodle-pr=` query param | Auto-generated blueprint for testing a Moodle core PR |
+| 6 | `?import-site=` query param | Deferred site import (blueprint with import step) |
+| 7 | sessionStorage | Persisted from a previous load in the same tab |
+| 8 | Default blueprint URL | Configured in `playground.config.json` |
+| 9 | Built-in default | Minimal install + login |
+
+### ZIP Bundle Support
+
+The `?blueprint-url=` parameter also accepts ZIP files. When a URL ends in `.zip` or
+the response has a ZIP content type, the resolver extracts `blueprint.json` from the
+archive root. Other files in the ZIP are available as bundled resources.
 
 ### Inline Blueprint (base64)
 
@@ -202,6 +212,8 @@ Named resources can be defined once and referenced from steps using `@name`:
 | `setConfig` | Set a single Moodle config value |
 | `setConfigs` | Set multiple config values in one call |
 | `setLandingPage` | Override the post-boot landing page |
+| `setSiteLanguage` | Set the site default language |
+| `defineConfigConstants` | Inject PHP `define()` constants into config.php |
 
 ### Users
 
@@ -248,6 +260,21 @@ Named resources can be defined once and referenced from steps using `@name`:
 | `copyFile` | Copy a file |
 | `moveFile` | Move a file |
 | `unzip` | Extract a ZIP archive |
+
+### Database
+
+| Step | Description |
+|------|-------------|
+| `runSql` | Execute a raw SQL statement via Moodle's `$DB->execute()` |
+| `runSqlFile` | Execute SQL from a file or resource reference |
+| `resetData` | Reset Moodle database tables to their default state |
+| `applyPatch` | Apply a diff patch to the Moodle source tree (stub — planned) |
+
+### Backup & Restore
+
+| Step | Description |
+|------|-------------|
+| `restoreCourseBackup` | Restore a Moodle course backup (.mbz) file |
 
 ### Low-level
 
@@ -500,6 +527,97 @@ repository.
 > you see a blank page or the theme falls back to Boost, your Moove ref does
 > not match the Moodle version used by this playground. Check the Moodle
 > branch shown in the shell footer and swap the ref accordingly.
+
+### setSiteLanguage
+
+Sets the Moodle site default language. The language pack must already be available.
+
+```json
+{
+  "step": "setSiteLanguage",
+  "lang": "es"
+}
+```
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `lang` | yes | Language code (e.g., `en`, `es`, `fr`, `de`) |
+
+### defineConfigConstants
+
+Injects PHP `define()` statements into `config.php` before Moodle's `setup.php` runs.
+Useful for setting constants that must exist before Moodle bootstraps.
+
+```json
+{
+  "step": "defineConfigConstants",
+  "constants": {
+    "MY_CUSTOM_FLAG": true,
+    "EXTERNAL_API_URL": "https://api.example.com"
+  }
+}
+```
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `constants` | yes | Object of `{ name: value }` pairs. Values are PHP-escaped. |
+
+### runSql
+
+Executes a raw SQL statement via Moodle's `$DB->execute()`.
+
+```json
+{
+  "step": "runSql",
+  "sql": "UPDATE {config} SET value = 'My School' WHERE name = 'fullname'"
+}
+```
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `sql` | yes | SQL statement using Moodle table prefixes (`{tablename}`) |
+
+### runSqlFile
+
+Executes SQL from a file or resource reference.
+
+```json
+{
+  "step": "runSqlFile",
+  "file": "@seedData"
+}
+```
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `file` | yes | Resource reference or inline SQL content |
+
+### resetData
+
+Resets Moodle database tables by truncating and re-seeding them.
+
+```json
+{
+  "step": "resetData"
+}
+```
+
+### restoreCourseBackup
+
+Restores a Moodle course backup (`.mbz` file) into the playground.
+
+```json
+{
+  "step": "restoreCourseBackup",
+  "file": { "url": "https://example.com/backup.mbz" },
+  "categoryId": 1
+}
+```
+
+| Field | Required | Default | Description |
+|-------|----------|---------|-------------|
+| `file` | yes | — | Resource descriptor for the `.mbz` file |
+| `categoryId` | no | `1` | Target course category ID |
 
 ## Naming Conventions
 

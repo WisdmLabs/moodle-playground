@@ -53,33 +53,50 @@ Do not hand-edit generated artifacts.
 
 ```text
 src/
-  shell/main.js        # Shell UI logic
-  remote/main.js       # Runtime host
+  shell/
+    main.js              # Shell UI logic (toolbar, panels, share, export/import)
+    github-export.js     # GitHub Gist blueprint export
+    instance-manager.js  # Multi-instance session management
+  remote/main.js         # Runtime host and client API bridge
   runtime/
-    bootstrap.js       # Moodle bootstrap and install
-    php-loader.js      # PHP instance creation
-    php-compat.js      # WP Playground API compatibility
-    config-template.js # config.php generator
-  blueprint/           # Step-based blueprint system
-    index.js           # Public re-exports
-    parser.js          # JSON / base64 / data-URL parsing
-    schema.js          # Hand-written validator
-    constants.js       # {{KEY}} placeholder substitution
-    resources.js       # Named resource registry
-    resolver.js        # Blueprint source resolution
-    executor.js        # Sequential step runner
-    storage.js         # sessionStorage persistence
-    steps/             # Step handlers (filesystem, Moodle API, etc.)
-    php/helpers.js     # PHP code generators for Moodle API calls
-  shared/              # Shared utilities
-  styles/app.css       # App stylesheet
-patches/shared/        # Canonical shared build-time patches
-patches/moodle/        # Legacy fallback patch root
-patches/<branch>/      # Optional branch-specific source-root overrides
-scripts/               # Build and utility scripts
-assets/blueprints/     # Blueprint definitions and examples
-tests/blueprint/       # Blueprint unit tests
-docs/                  # Documentation (this site)
+    bootstrap.js         # Moodle bootstrap and install
+    php-loader.js        # PHP instance creation
+    php-compat.js        # WP Playground API compatibility
+    config-template.js   # config.php generator
+    crash-recovery.js    # WASM crash detection and state recovery
+  blueprint/             # Step-based blueprint system
+    index.js             # Public re-exports
+    parser.js            # JSON / base64 / data-URL parsing
+    schema.js            # Hand-written validator
+    constants.js         # {{KEY}} placeholder substitution
+    resources.js         # Named resource registry
+    resolver.js          # Blueprint source resolution (8+ sources)
+    executor.js          # Sequential step runner
+    storage.js           # sessionStorage persistence
+    steps/               # Step handlers
+      moodle-database.js # runSql, runSqlFile, resetData, applyPatch
+      moodle-backup.js   # restoreCourseBackup
+      moodle-config.js   # setSiteLanguage, defineConfigConstants
+    php/helpers.js       # PHP code generators for Moodle API calls
+  persistence/           # Site export/import and sharing
+    snapshot.js          # Collect runtime state (DB, files, plugins)
+    export.js            # Create ZIP from snapshot
+    import.js            # Restore ZIP into runtime
+    share.js             # Generate shareable URLs
+  mcp/
+    bridge.js            # MCP protocol bridge (postMessage-based)
+  shared/                # Shared utilities
+  styles/app.css         # App stylesheet
+packages/
+  client/                # @moodle-playground/client library
+    src/index.js         # startMoodlePlayground() and client API
+patches/shared/          # Canonical shared build-time patches
+patches/moodle/          # Legacy fallback patch root
+patches/<branch>/        # Optional branch-specific source-root overrides
+scripts/                 # Build and utility scripts
+assets/blueprints/       # Blueprint definitions and examples
+tests/                   # Unit and E2E tests
+docs/                    # Documentation (this site)
 ```
 
 ## Documentation
