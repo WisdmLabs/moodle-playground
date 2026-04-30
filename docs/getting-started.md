@@ -18,7 +18,7 @@ This page gets you from a fresh clone to a running Moodle Playground instance an
 ## Local setup
 
 ```bash
-git clone https://github.com/ateeducacion/moodle-playground.git
+git clone https://github.com/WisdmLabs/moodle-playground.git
 cd moodle-playground
 npm install
 ```

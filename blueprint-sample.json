@@ -29,7 +29,7 @@
     },
     {
       "step": "installMoodlePlugin",
-      "url": "https://github.com/ateeducacion/moodle-mod_simplemod/archive/refs/heads/main.zip"
+      "url": "https://github.com/WisdmLabs/moodle-mod_simplemod/archive/refs/heads/main.zip"
     },
     {
       "step": "installMoodlePlugin",

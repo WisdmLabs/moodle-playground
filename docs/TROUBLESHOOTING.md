@@ -322,15 +322,15 @@ NOT pull from the `ateeducacion/moodle` fork. Fixing only the fork will NOT fix 
 1. Reproduce and fix on the `mdl-88218-workbench` branch using `make up` (local PHP + SQLite)
 2. Replicate the fix to all three maintained upstream branches
 3. **Also** apply the fix to `patches/shared/lib/dml/` or `patches/shared/lib/ddl/` in this repo
-4. Trigger a manual rebuild via [GitHub Actions](https://github.com/ateeducacion/moodle-playground/actions/workflows/ci.yml) (Run workflow → select `main`)
+4. Trigger a manual rebuild via [GitHub Actions](https://github.com/WisdmLabs/moodle-playground/actions/workflows/ci.yml) (Run workflow → select `main`)
 
-See [`.agents/references/sqlite-upstream-workflow.md`](https://github.com/ateeducacion/moodle-playground/blob/main/.agents/references/sqlite-upstream-workflow.md) for the full procedure.
+See [`.agents/references/sqlite-upstream-workflow.md`](https://github.com/WisdmLabs/moodle-playground/blob/main/.agents/references/sqlite-upstream-workflow.md) for the full procedure.
 
 ### Example: `ddltablenotexist` — Table "backup_ids_temp" does not exist
 
 Root cause: `fetch_columns()` only queried `sqlite_master` but SQLite stores
 temporary tables in `sqlite_temp_master`. Fixed by adding `UNION ALL` with
-`sqlite_temp_master` ([#48](https://github.com/ateeducacion/moodle-playground/issues/48)).
+`sqlite_temp_master` ([#48](https://github.com/WisdmLabs/moodle-playground/issues/48)).
 
 ## If install fails mid-way
 

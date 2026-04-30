@@ -5,7 +5,7 @@ Each blueprint can be loaded via the `?blueprint-url=` query parameter or
 pasted into the Blueprint panel in the playground UI.
 
 All examples live in
-[`assets/blueprints/examples/`](https://github.com/ateeducacion/moodle-playground/tree/main/assets/blueprints/examples).
+[`assets/blueprints/examples/`](https://github.com/WisdmLabs/moodle-playground/tree/main/assets/blueprints/examples).
 
 ---
 
@@ -141,7 +141,7 @@ a course to demonstrate it.
 Append `?blueprint-url=` with the path to any example:
 
 ```
-https://ateeducacion.github.io/moodle-playground/?blueprint-url=assets/blueprints/examples/classroom-ready.blueprint.json
+https://WisdmLabs.github.io/moodle-playground/?blueprint-url=assets/blueprints/examples/classroom-ready.blueprint.json
 ```
 
 ### Via the Blueprint panel

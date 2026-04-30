@@ -7,8 +7,8 @@
 **Moodle running entirely in your browser, via WebAssembly.** No server, no installation, no data leaves your machine.
 
 [![Open the playground](https://img.shields.io/badge/Open-moodle--playground.com-f5923a?style=for-the-badge)](https://moodle-playground.com)
-[![GitHub](https://img.shields.io/badge/source-GitHub-181717?style=for-the-badge&logo=github)](https://github.com/ateeducacion/moodle-playground)
-[![License GPL](https://img.shields.io/badge/license-GPLv3-blue?style=for-the-badge)](https://github.com/ateeducacion/moodle-playground/blob/main/LICENSE)
+[![GitHub](https://img.shields.io/badge/source-GitHub-181717?style=for-the-badge&logo=github)](https://github.com/WisdmLabs/moodle-playground)
+[![License GPL](https://img.shields.io/badge/license-GPLv3-blue?style=for-the-badge)](https://github.com/WisdmLabs/moodle-playground/blob/main/LICENSE)
 
 ## What is this?
 
@@ -61,7 +61,7 @@ See the [Architecture overview](architecture.md) for the full picture.
 
     ```bash
     # Clone
-    git clone https://github.com/ateeducacion/moodle-playground.git
+    git clone https://github.com/WisdmLabs/moodle-playground.git
     cd moodle-playground
 
     # Install and build
@@ -189,7 +189,7 @@ See the [Architecture overview](architecture.md) for the full picture.
 
 The project includes a reusable GitHub Action for live PR previews:
 
-- [**action-moodle-playground-pr-preview**](https://github.com/ateeducacion/action-moodle-playground-pr-preview) — Deploys a temporary Moodle Playground instance for each pull request so reviewers can test changes in the browser before merging.
+- [**action-moodle-playground-pr-preview**](https://github.com/WisdmLabs/action-moodle-playground-pr-preview) — Deploys a temporary Moodle Playground instance for each pull request so reviewers can test changes in the browser before merging.
 
 The main CI/CD pipeline (`.github/workflows/ci.yml`) handles linting, unit tests, Playwright E2E (Chromium + Firefox), and deployment to GitHub Pages on push to `main`.
 

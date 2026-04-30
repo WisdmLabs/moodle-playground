@@ -33,7 +33,7 @@ Open the [live demo](https://moodle-playground.com/) — no install needed.
 ### Run it locally
 
 ```bash
-git clone https://github.com/ateeducacion/moodle-playground.git
+git clone https://github.com/WisdmLabs/moodle-playground.git
 cd moodle-playground
 make up
 ```

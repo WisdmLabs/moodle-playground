@@ -287,7 +287,7 @@ describe("isSensitiveStaticPath", () => {
 
 describe("rewriteHtmlAttributeUrl", () => {
   const scope = {
-    origin: "https://ateeducacion.github.io",
+    origin: "https://wisdmlabs.github.io",
     scopeId: "main",
     runtimeId: "php83-moodle50",
     appBasePath: "/moodle-playground",

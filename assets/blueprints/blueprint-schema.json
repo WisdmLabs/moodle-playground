@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ateeducacion.github.io/moodle-playground/assets/blueprints/blueprint-schema.json",
+  "$id": "https://WisdmLabs.github.io/moodle-playground/assets/blueprints/blueprint-schema.json",
   "title": "Moodle Playground Blueprint",
   "description": "Step-based blueprint for provisioning a Moodle Playground instance.",
   "type": "object",
