@@ -45,8 +45,30 @@ Then open <http://localhost:8080>.
 - Node.js 18+
 - npm
 - Python 3 for Moodle patch/build helpers and docs
-- PHP 8.3 with `pdo_sqlite` (for `make up-local`)
+- PHP 8.3 with `pdo_sqlite`, `gd`, and `intl` extensions
 - Git
+
+#### WSL / Ubuntu setup
+
+On WSL or Ubuntu, the default PHP may not be 8.3 and may be missing required extensions.
+Install them with:
+
+```bash
+sudo apt install php8.3 php8.3-sqlite3 php8.3-gd php8.3-intl
+```
+
+Then run with `PHP_BIN=/usr/bin/php8.3 make up` if `php` points to a different version.
+
+Without `gd` and `intl`, the install snapshot cannot be generated. The playground will
+still work (it falls back to a slower CLI install in the WASM runtime), but boot times
+will be longer and auto-login may be unreliable.
+
+### Default credentials
+
+- **Username:** `admin`
+- **Password:** `password`
+
+The playground auto-logs you in by default. If you see a login page, use these credentials.
 
 ## How It Works
 

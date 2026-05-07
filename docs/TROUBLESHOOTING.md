@@ -4,6 +4,51 @@ This file is the fast path for debugging the current Moodle-on-wasm SQLite proto
 
 For the full migration history and rationale, see [`sqlite-wasm-migration-notes.md`](./sqlite-wasm-migration-notes.md).
 
+## Login issues
+
+### Auto-login not working / admin password rejected
+
+Default credentials are `admin` / `password`.
+
+Common causes:
+
+1. **Missing PHP extensions on the build machine.** If `php8.3-gd` or `php8.3-intl`
+   are not installed, snapshot generation fails silently during `make up`. Without a
+   snapshot, the WASM runtime falls back to a full CLI install at every page load,
+   which can cause auto-login timing issues.
+
+   Fix: `sudo apt install php8.3-gd php8.3-intl` and rebuild with `make clean && make up`.
+
+2. **Boot not fully complete.** The auto-login runs near the end of the boot sequence
+   (progress ~0.95). If you interact before boot finishes, you'll see the login page.
+   Wait for the progress bar to reach 100%.
+
+3. **Stale Service Worker.** A cached Service Worker from a previous build may interfere
+   with session cookies. Hard-reload (Ctrl+Shift+R) or click Reset in the toolbar.
+
+4. **WSL cross-filesystem performance.** Running from `/mnt/c/...` (Windows filesystem)
+   is slower than native Linux paths (`~/...`). Clone to a native Linux path for better
+   boot performance and more reliable auto-login.
+
+To debug: open with `?debug=true` and check the browser console for messages about
+"auto-login", "snapshot", and "finalize".
+
+### Snapshot generation failed (WARNING during `make up`)
+
+If you see `WARNING: Snapshot generation failed` during build:
+
+```bash
+# Check PHP extensions
+php8.3 -m | grep -E "gd|intl|pdo_sqlite"
+
+# All three should appear. If missing:
+sudo apt install php8.3-gd php8.3-intl php8.3-sqlite3
+
+# Rebuild
+make clean
+PHP_BIN=/usr/bin/php8.3 make up
+```
+
 ## Quick checks
 
 Runtime debug mode in the browser:
