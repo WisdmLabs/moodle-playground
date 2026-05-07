@@ -250,7 +250,9 @@ export class McpBridge {
         description: "Create a directory in MEMFS",
         inputSchema: {
           type: "object",
-          properties: { path: { type: "string", description: "Directory path" } },
+          properties: {
+            path: { type: "string", description: "Directory path" },
+          },
           required: ["path"],
         },
       },
@@ -268,7 +270,9 @@ export class McpBridge {
         description: "Delete a directory from MEMFS",
         inputSchema: {
           type: "object",
-          properties: { path: { type: "string", description: "Directory path" } },
+          properties: {
+            path: { type: "string", description: "Directory path" },
+          },
           required: ["path"],
         },
       },
@@ -277,7 +281,9 @@ export class McpBridge {
         description: "Check if a file or directory exists in MEMFS",
         inputSchema: {
           type: "object",
-          properties: { path: { type: "string", description: "Path to check" } },
+          properties: {
+            path: { type: "string", description: "Path to check" },
+          },
           required: ["path"],
         },
       },
@@ -286,7 +292,9 @@ export class McpBridge {
         description: "Apply a blueprint JSON to the running instance",
         inputSchema: {
           type: "object",
-          properties: { blueprint: { type: "object", description: "Blueprint JSON" } },
+          properties: {
+            blueprint: { type: "object", description: "Blueprint JSON" },
+          },
           required: ["blueprint"],
         },
       },
@@ -315,8 +323,14 @@ export class McpBridge {
           type: "object",
           properties: {
             url: { type: "string", description: "GitHub archive ZIP URL" },
-            pluginType: { type: "string", description: "Plugin type (auto-detected)" },
-            pluginName: { type: "string", description: "Plugin name (auto-detected)" },
+            pluginType: {
+              type: "string",
+              description: "Plugin type (auto-detected)",
+            },
+            pluginName: {
+              type: "string",
+              description: "Plugin name (auto-detected)",
+            },
           },
           required: ["url"],
         },

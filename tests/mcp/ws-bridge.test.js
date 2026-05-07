@@ -11,7 +11,9 @@ try {
   importError = err;
 }
 
-describe("WsBridge", { skip: importError ? "ws package not installed at workspace root" : false }, () => {
+describe("WsBridge", {
+  skip: importError ? "ws package not installed at workspace root" : false,
+}, () => {
   it("should generate a 32-character hex token", () => {
     const bridge = new WsBridge({ port: 0 });
     assert.equal(bridge.token.length, 32);

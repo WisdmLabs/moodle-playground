@@ -33,10 +33,7 @@ describe("MCP Tool Definitions", () => {
 
   it("should have inputSchema for every tool", () => {
     for (const tool of TOOL_DEFINITIONS) {
-      assert.ok(
-        tool.inputSchema,
-        `Tool ${tool.name} missing inputSchema`,
-      );
+      assert.ok(tool.inputSchema, `Tool ${tool.name} missing inputSchema`);
       assert.equal(
         tool.inputSchema.type,
         "object",
@@ -91,7 +88,9 @@ describe("MCP Tool Definitions", () => {
   });
 
   it("should require url for installPlugin", () => {
-    const tool = TOOL_DEFINITIONS.find((t) => t.name === "moodle/installPlugin");
+    const tool = TOOL_DEFINITIONS.find(
+      (t) => t.name === "moodle/installPlugin",
+    );
     assert.deepEqual(tool.inputSchema.required, ["url"]);
   });
 
@@ -101,7 +100,9 @@ describe("MCP Tool Definitions", () => {
   });
 
   it("should require blueprint for applyBlueprint", () => {
-    const tool = TOOL_DEFINITIONS.find((t) => t.name === "moodle/applyBlueprint");
+    const tool = TOOL_DEFINITIONS.find(
+      (t) => t.name === "moodle/applyBlueprint",
+    );
     assert.deepEqual(tool.inputSchema.required, ["blueprint"]);
   });
 

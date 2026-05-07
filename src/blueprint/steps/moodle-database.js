@@ -66,9 +66,7 @@ async function handleResetData(step, { php }) {
     );
   }
   if (targets.includes("categories")) {
-    parts.push(
-      "$DB->delete_records_select('course_categories', 'id > 1');",
-    );
+    parts.push("$DB->delete_records_select('course_categories', 'id > 1');");
   }
   const code = `${CLI_HEADER}
 global $DB;

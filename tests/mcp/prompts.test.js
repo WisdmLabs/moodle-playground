@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import {
-  PROMPT_DEFINITIONS,
   getPromptMessages,
+  PROMPT_DEFINITIONS,
 } from "../../packages/mcp/src/prompts.js";
 
 describe("MCP Prompt Definitions", () => {
@@ -13,12 +13,19 @@ describe("MCP Prompt Definitions", () => {
   it("should have unique prompt names", () => {
     const names = PROMPT_DEFINITIONS.map((p) => p.name);
     const uniqueNames = new Set(names);
-    assert.equal(uniqueNames.size, names.length, "Duplicate prompt names found");
+    assert.equal(
+      uniqueNames.size,
+      names.length,
+      "Duplicate prompt names found",
+    );
   });
 
   it("should have description for every prompt", () => {
     for (const prompt of PROMPT_DEFINITIONS) {
-      assert.ok(prompt.description, `Prompt ${prompt.name} missing description`);
+      assert.ok(
+        prompt.description,
+        `Prompt ${prompt.name} missing description`,
+      );
     }
   });
 
@@ -47,14 +54,18 @@ describe("MCP Prompt Definitions", () => {
 
   it("create-course should require fullname and shortname", () => {
     const prompt = PROMPT_DEFINITIONS.find((p) => p.name === "create-course");
-    const required = prompt.arguments.filter((a) => a.required).map((a) => a.name);
+    const required = prompt.arguments
+      .filter((a) => a.required)
+      .map((a) => a.name);
     assert.ok(required.includes("fullname"));
     assert.ok(required.includes("shortname"));
   });
 
   it("install-plugin should require url", () => {
     const prompt = PROMPT_DEFINITIONS.find((p) => p.name === "install-plugin");
-    const required = prompt.arguments.filter((a) => a.required).map((a) => a.name);
+    const required = prompt.arguments
+      .filter((a) => a.required)
+      .map((a) => a.name);
     assert.ok(required.includes("url"));
   });
 });
@@ -111,9 +122,6 @@ describe("getPromptMessages", () => {
   });
 
   it("should throw for unknown prompt", () => {
-    assert.throws(
-      () => getPromptMessages("nonexistent"),
-      /Unknown prompt/,
-    );
+    assert.throws(() => getPromptMessages("nonexistent"), /Unknown prompt/);
   });
 });

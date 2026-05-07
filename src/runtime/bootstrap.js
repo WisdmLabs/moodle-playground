@@ -2242,18 +2242,13 @@ export async function bootstrapMoodle({
         }
 
         // Restore plugin directories
-        const pluginPaths = await persistenceStore.listFiles(
-          `${webRoot}/`,
-        );
+        const pluginPaths = await persistenceStore.listFiles(`${webRoot}/`);
         if (pluginPaths.length > 0) {
           let pluginFileCount = 0;
           for (const filePath of pluginPaths) {
             const data = await persistenceStore.loadFile(filePath);
             if (!data) continue;
-            const parentDir = filePath.substring(
-              0,
-              filePath.lastIndexOf("/"),
-            );
+            const parentDir = filePath.substring(0, filePath.lastIndexOf("/"));
             try {
               php._php.mkdirTree(parentDir);
             } catch {

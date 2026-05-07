@@ -95,10 +95,7 @@ export async function resolveBlueprint({
 
         let blueprint;
         const contentType = response.headers.get("content-type") || "";
-        if (
-          blueprintUrlParam.endsWith(".zip") ||
-          contentType.includes("zip")
-        ) {
+        if (blueprintUrlParam.endsWith(".zip") || contentType.includes("zip")) {
           blueprint = await resolveBundleZip(response);
         } else {
           blueprint = await response.json();
@@ -135,7 +132,9 @@ export async function resolveBlueprint({
   if (loc) {
     const moodlePr = new URL(loc.href).searchParams.get("moodle-pr");
     if (moodlePr) {
-      console.log(`[blueprint] Generating blueprint for Moodle PR #${moodlePr}.`);
+      console.log(
+        `[blueprint] Generating blueprint for Moodle PR #${moodlePr}.`,
+      );
       const prBlueprint = buildPrBlueprint(moodlePr, parseQueryParams(loc));
       saveBlueprint(scopeId, prBlueprint);
       return prBlueprint;
@@ -146,7 +145,9 @@ export async function resolveBlueprint({
   if (loc) {
     const importSiteUrl = new URL(loc.href).searchParams.get("import-site");
     if (importSiteUrl) {
-      console.log("[blueprint] import-site= detected, using minimal blueprint for boot.");
+      console.log(
+        "[blueprint] import-site= detected, using minimal blueprint for boot.",
+      );
       const minimal = {
         landingPage: "/",
         preferredVersions: { php: "8.3", moodle: "5.0" },

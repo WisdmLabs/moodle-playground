@@ -99,5 +99,5 @@ export function createSyncCallback(store, dbFilePath, { postShell } = {}) {
   return { syncFs, setPhp };
 }
 
-export { OpfsStore } from "./opfs-store.js";
 export { IdbFallbackStore } from "./idb-fallback.js";
+export { OpfsStore } from "./opfs-store.js";

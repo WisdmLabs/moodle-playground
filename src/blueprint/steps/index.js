@@ -1,4 +1,5 @@
 import { registerFilesystemSteps } from "./filesystem.js";
+import { registerMoodleBackupSteps } from "./moodle-backup.js";
 import { registerMoodleCategorySteps } from "./moodle-categories.js";
 import { registerMoodleConfigSteps } from "./moodle-config.js";
 import { registerMoodleCourseSteps } from "./moodle-courses.js";
@@ -8,7 +9,6 @@ import { registerMoodleInstallSteps } from "./moodle-install.js";
 import { registerMoodleModuleSteps } from "./moodle-modules.js";
 import { registerMoodlePluginSteps } from "./moodle-plugins.js";
 import { registerMoodleUserSteps } from "./moodle-users.js";
-import { registerMoodleBackupSteps } from "./moodle-backup.js";
 import { registerRequestSteps } from "./request.js";
 
 /** @type {Map<string, (step: object, context: object) => Promise<void>>} */

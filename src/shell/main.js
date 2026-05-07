@@ -853,7 +853,9 @@ function closeSharePopover() {
 
 function updateShareUrl() {
   if (!els.shareUrlInput) return;
-  const shareType = document.querySelector('input[name="share-type"]:checked')?.value || "blueprint";
+  const shareType =
+    document.querySelector('input[name="share-type"]:checked')?.value ||
+    "blueprint";
   const baseUrl = new URL(window.location.href);
   baseUrl.search = "";
   baseUrl.hash = "";
@@ -866,7 +868,9 @@ function updateShareUrl() {
   } else {
     // Query params mode
     if (currentMoodleBranch) {
-      const meta = MOODLE_BRANCHES.find(b => b.branch === currentMoodleBranch);
+      const meta = MOODLE_BRANCHES.find(
+        (b) => b.branch === currentMoodleBranch,
+      );
       if (meta) baseUrl.searchParams.set("moodle", meta.version);
     }
     if (currentPhpVersion) baseUrl.searchParams.set("php", currentPhpVersion);
@@ -878,7 +882,9 @@ async function main() {
   config = await loadPlaygroundConfig();
 
   // Display mode: seamless hides all chrome for embedding
-  const displayMode = new URLSearchParams(window.location.search).get("mode") || "browser-full-screen";
+  const displayMode =
+    new URLSearchParams(window.location.search).get("mode") ||
+    "browser-full-screen";
   if (displayMode === "seamless") {
     document.body.classList.add("is-seamless");
   }
@@ -986,7 +992,9 @@ async function main() {
         navigator.clipboard.writeText(els.shareUrlInput.value).then(() => {
           const orig = els.shareCopyButton.textContent;
           els.shareCopyButton.textContent = "Copied!";
-          setTimeout(() => { els.shareCopyButton.textContent = orig; }, 1200);
+          setTimeout(() => {
+            els.shareCopyButton.textContent = orig;
+          }, 1200);
         });
       }
     });
@@ -1012,9 +1020,14 @@ async function main() {
       try {
         els.githubGistButton.disabled = true;
         els.githubGistButton.textContent = "Creating...";
-        const { exportBlueprintAsGist, buildGistPlaygroundUrl } = await import("./github-export.js");
+        const { exportBlueprintAsGist, buildGistPlaygroundUrl } = await import(
+          "./github-export.js"
+        );
         const gist = await exportBlueprintAsGist(activeBlueprint, token);
-        const playgroundUrl = buildGistPlaygroundUrl(gist.rawUrl, window.location.origin + window.location.pathname);
+        const playgroundUrl = buildGistPlaygroundUrl(
+          gist.rawUrl,
+          window.location.origin + window.location.pathname,
+        );
         if (els.githubGistResult) {
           els.githubGistResult.hidden = false;
           els.githubGistResult.textContent = "";
@@ -1048,7 +1061,8 @@ async function main() {
   phpInfoCapturePromise = null;
   setUiLocked(true);
 
-  const isLazy = new URLSearchParams(window.location.search).get("lazy") === "true";
+  const isLazy =
+    new URLSearchParams(window.location.search).get("lazy") === "true";
   if (isLazy) {
     showLazySplash();
   } else {

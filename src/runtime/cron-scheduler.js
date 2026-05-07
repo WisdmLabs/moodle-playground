@@ -35,10 +35,7 @@ export class CronScheduler {
       await Promise.race([
         this.executor(),
         new Promise((_, reject) =>
-          setTimeout(
-            () => reject(new Error("Cron timeout")),
-            this.maxRunTime,
-          ),
+          setTimeout(() => reject(new Error("Cron timeout")), this.maxRunTime),
         ),
       ]);
       this.lastRun = Date.now();
@@ -72,10 +69,7 @@ export class CronScheduler {
       await Promise.race([
         this.executor(),
         new Promise((_, reject) =>
-          setTimeout(
-            () => reject(new Error("Cron timeout")),
-            this.maxRunTime,
-          ),
+          setTimeout(() => reject(new Error("Cron timeout")), this.maxRunTime),
         ),
       ]);
       this.lastRun = Date.now();

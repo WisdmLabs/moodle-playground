@@ -588,10 +588,17 @@ function connectMcpWebSocket(url, scopeId, runtimeId) {
 
         const { requestId, toolName, arguments: args } = msg;
         try {
-          const result = await dispatchMcpToolCall(toolName, args, scopeId, runtimeId);
+          const result = await dispatchMcpToolCall(
+            toolName,
+            args,
+            scopeId,
+            runtimeId,
+          );
           ws.send(JSON.stringify({ responseId: requestId, result }));
         } catch (error) {
-          ws.send(JSON.stringify({ responseId: requestId, error: error.message }));
+          ws.send(
+            JSON.stringify({ responseId: requestId, error: error.message }),
+          );
         }
       } catch {
         // Ignore malformed messages

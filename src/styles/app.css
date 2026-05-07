@@ -993,19 +993,30 @@ button.danger:hover {
 }
 
 /* ── Seamless mode (embedded, no chrome) ──────────── */
-body.is-seamless .browser-toolbar { display: none; }
-body.is-seamless .side-panel { display: none; }
+body.is-seamless .browser-toolbar {
+  display: none;
+}
+body.is-seamless .side-panel {
+  display: none;
+}
 body.is-seamless .workspace {
   grid-template-columns: 1fr;
   height: 100vh;
   height: 100dvh;
   margin-top: 0;
 }
-body.is-seamless .viewport { height: 100vh; height: 100dvh; }
-body.is-seamless .viewport iframe { border: none; }
+body.is-seamless .viewport {
+  height: 100vh;
+  height: 100dvh;
+}
+body.is-seamless .viewport iframe {
+  border: none;
+}
 body.is-seamless .settings-popover,
 body.is-seamless .settings-popover-overlay,
-body.is-seamless .share-popover { display: none !important; }
+body.is-seamless .share-popover {
+  display: none !important;
+}
 
 /* ── Lazy boot splash ────────────────────────────── */
 .lazy-splash {

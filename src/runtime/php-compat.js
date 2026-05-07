@@ -78,7 +78,7 @@ function resolveScriptPath(pathname, webRoot) {
   // This avoids ambiguity from the generic ".php/" matcher when URL encoding
   // or unusual path segments are involved.
   for (const script of KNOWN_ASSET_SCRIPTS) {
-    if (pathname.startsWith(script + "/") || pathname === script) {
+    if (pathname.startsWith(`${script}/`) || pathname === script) {
       const scriptPath = `${webRoot}${script}`;
       const pathInfo = pathname.substring(script.length);
       return { scriptPath, pathInfo };
@@ -213,7 +213,9 @@ export function wrapPhpInstance(
       // Include the resolved path in the response body to aid debugging
       // "No input file specified" style errors.
       if (!php.fileExists(scriptPath)) {
-        console.warn(`[php-compat] Script not found: ${scriptPath} (pathname=${pathname})`);
+        console.warn(
+          `[php-compat] Script not found: ${scriptPath} (pathname=${pathname})`,
+        );
         return new Response(`Script not found: ${scriptPath}`, { status: 404 });
       }
 

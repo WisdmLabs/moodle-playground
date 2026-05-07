@@ -25,7 +25,10 @@ describe("MCP Resource Definitions", () => {
   it("should have name and description for every resource", () => {
     for (const resource of RESOURCE_DEFINITIONS) {
       assert.ok(resource.name, `Resource ${resource.uri} missing name`);
-      assert.ok(resource.description, `Resource ${resource.uri} missing description`);
+      assert.ok(
+        resource.description,
+        `Resource ${resource.uri} missing description`,
+      );
     }
   });
 

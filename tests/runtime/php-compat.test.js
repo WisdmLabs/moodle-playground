@@ -27,7 +27,7 @@ const KNOWN_ASSET_SCRIPTS = new Set([
 function resolveScriptPath(pathname, webRoot) {
   // Fast path: check known asset scripts first
   for (const script of KNOWN_ASSET_SCRIPTS) {
-    if (pathname.startsWith(script + "/") || pathname === script) {
+    if (pathname.startsWith(`${script}/`) || pathname === script) {
       const scriptPath = `${webRoot}${script}`;
       const pathInfo = pathname.substring(script.length);
       return { scriptPath, pathInfo };
@@ -149,10 +149,7 @@ describe("resolveScriptPath", () => {
   });
 
   it("resolves pluginfile.php via known-script shortlist", () => {
-    const result = resolveScriptPath(
-      "/pluginfile.php/5/user/icon/f1",
-      webRoot,
-    );
+    const result = resolveScriptPath("/pluginfile.php/5/user/icon/f1", webRoot);
     assert.strictEqual(result.scriptPath, "/www/moodle/pluginfile.php");
     assert.strictEqual(result.pathInfo, "/5/user/icon/f1");
   });
@@ -178,7 +175,10 @@ describe("resolveScriptPath", () => {
       webRoot,
     );
     assert.strictEqual(result.scriptPath, "/www/moodle/tokenpluginfile.php");
-    assert.strictEqual(result.pathInfo, "/abc123/mod_resource/content/0/file.pdf");
+    assert.strictEqual(
+      result.pathInfo,
+      "/abc123/mod_resource/content/0/file.pdf",
+    );
   });
 
   it("resolves yui_combo.php via known-script shortlist", () => {
@@ -187,7 +187,10 @@ describe("resolveScriptPath", () => {
       webRoot,
     );
     assert.strictEqual(result.scriptPath, "/www/moodle/lib/yui_combo.php");
-    assert.strictEqual(result.pathInfo, "/combo?rollup/3.18.1/yui-moodlesimple-min.js");
+    assert.strictEqual(
+      result.pathInfo,
+      "/combo?rollup/3.18.1/yui-moodlesimple-min.js",
+    );
   });
 });
 

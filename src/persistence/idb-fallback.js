@@ -109,9 +109,7 @@ export class IdbFallbackStore {
     const allKeys = await idbRequest(store.getAllKeys());
     for (const key of allKeys) {
       if (typeof key !== "string" || !key.startsWith(this._prefix)) continue;
-      const data = await idbRequest(
-        tx(this._db, "readonly").get(key),
-      );
+      const data = await idbRequest(tx(this._db, "readonly").get(key));
       if (data) {
         totalSize += data.byteLength || data.length || 0;
         fileCount += 1;
