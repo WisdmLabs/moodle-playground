@@ -1,5 +1,5 @@
 /**
- * @moodle-playground/client — Embed and control Moodle Playground instances.
+ * @edwiser/moodle-playground-client — Embed and control Moodle Playground instances.
  */
 
 const DEFAULT_REMOTE_URL = "https://moodle-playground.com/remote.html";

@@ -773,7 +773,7 @@ Document how to embed a Moodle Playground on any website:
 
 ## WS10: JavaScript Client Library (P2, 2 weeks)
 
-**Goal:** Publish an npm package (`@moodle-playground/client`) that lets developers embed and programmatically control Moodle Playground instances.
+**Goal:** Publish an npm package (`@edwiser/moodle-playground-client`) that lets developers embed and programmatically control Moodle Playground instances.
 
 ### Task 10.1: Define the client API
 
@@ -858,7 +858,7 @@ window.addEventListener("message", async (event) => {
 ```
 packages/
   client/
-    package.json    # name: "@moodle-playground/client", main, module, types
+    package.json    # name: "@edwiser/moodle-playground-client", main, module, types
     src/index.js
     src/types.d.ts  # TypeScript declarations
     README.md
@@ -868,7 +868,7 @@ packages/
 **package.json:**
 ```json
 {
-  "name": "@moodle-playground/client",
+  "name": "@edwiser/moodle-playground-client",
   "version": "0.1.0",
   "type": "module",
   "main": "dist/index.cjs",

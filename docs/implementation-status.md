@@ -78,7 +78,7 @@ Last updated: 2026-04-30
 | Feature | Status | Notes |
 |---------|--------|-------|
 | iframe embedding | Done | With `?mode=seamless` |
-| JavaScript client library | Done | `@moodle-playground/client` |
+| JavaScript client library | Done | `@edwiser/moodle-playground-client` |
 | MCP bridge (postMessage) | Done | 7 tools: navigate, runPhp, readFile, writeFile, listFiles, exportSite, importSite |
 | WebSocket MCP bridge | Planned | CLI companion tool for stdio/WebSocket |
 | Multi-instance manager | Done | Session-scoped instance switching |

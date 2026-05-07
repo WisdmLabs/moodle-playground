@@ -1,4 +1,4 @@
-# @moodle-playground/mcp-server
+# @edwiser/moodle-playground-mcp
 
 MCP (Model Context Protocol) server for controlling Moodle Playground from AI coding agents like Claude Code, Cursor, and GitHub Copilot.
 
@@ -13,7 +13,7 @@ The MCP server communicates with AI agents over stdio (standard MCP transport) a
 ## Quick Start
 
 ```bash
-npx @moodle-playground/mcp-server
+npx @edwiser/moodle-playground-mcp
 ```
 
 This will:
@@ -32,7 +32,7 @@ Add to `.claude/settings.json` or use the config file:
   "mcpServers": {
     "moodle-playground": {
       "command": "npx",
-      "args": ["-y", "@moodle-playground/mcp-server"]
+      "args": ["-y", "@edwiser/moodle-playground-mcp"]
     }
   }
 }
@@ -49,7 +49,7 @@ Add to your Claude Desktop MCP configuration:
   "mcpServers": {
     "moodle-playground": {
       "command": "npx",
-      "args": ["-y", "@moodle-playground/mcp-server"]
+      "args": ["-y", "@edwiser/moodle-playground-mcp"]
     }
   }
 }
@@ -64,7 +64,7 @@ Add to `.cursor/mcp.json`:
   "mcpServers": {
     "moodle-playground": {
       "command": "npx",
-      "args": ["-y", "@moodle-playground/mcp-server"]
+      "args": ["-y", "@edwiser/moodle-playground-mcp"]
     }
   }
 }

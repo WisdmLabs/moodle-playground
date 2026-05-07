@@ -37,9 +37,9 @@ Options:
   --help            Show this help
 
 Examples:
-  npx @moodle-playground/agent-skills --agent claude --global
-  npx @moodle-playground/agent-skills --skill moodle-playground
-  npx @moodle-playground/agent-skills --dest ./my-project/.claude/skills
+  npx @edwiser/moodle-playground-agent-skills --agent claude --global
+  npx @edwiser/moodle-playground-agent-skills --skill moodle-playground
+  npx @edwiser/moodle-playground-agent-skills --dest ./my-project/.claude/skills
 `);
 }
 

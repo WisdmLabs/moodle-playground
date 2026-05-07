@@ -1,5 +1,5 @@
 {
-  "name": "@moodle-playground/mcp",
+  "name": "@edwiser/moodle-playground-mcp",
   "version": "0.1.0",
   "description": "MCP server for controlling Moodle Playground from AI agents",
   "type": "module",

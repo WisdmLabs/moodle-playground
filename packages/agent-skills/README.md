@@ -1,4 +1,4 @@
-# @moodle-playground/agent-skills
+# @edwiser/moodle-playground-agent-skills
 
 AI agent skills for working with Moodle Playground. Install these skills to give
 your AI coding assistant context about the playground's MCP tools, blueprint system,
@@ -8,16 +8,16 @@ and plugin development workflow.
 
 ```bash
 # Claude Code (global install)
-npx @moodle-playground/agent-skills --agent claude --global
+npx @edwiser/moodle-playground-agent-skills --agent claude --global
 
 # Claude Code (project-level)
-npx @moodle-playground/agent-skills --agent claude --local
+npx @edwiser/moodle-playground-agent-skills --agent claude --local
 
 # Cursor
-npx @moodle-playground/agent-skills --agent cursor --global
+npx @edwiser/moodle-playground-agent-skills --agent cursor --global
 
 # VS Code
-npx @moodle-playground/agent-skills --agent vscode --global
+npx @edwiser/moodle-playground-agent-skills --agent vscode --global
 ```
 
 ## Available Skills

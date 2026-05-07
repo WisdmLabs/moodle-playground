@@ -26,7 +26,7 @@ Once connected, your AI assistant can:
 You  -->  AI Assistant (Claude, Cursor, Copilot)
             |  (stdio)
             v
-          MCP Server  (@moodle-playground/mcp-server)
+          MCP Server  (@edwiser/moodle-playground-mcp)
             |  (WebSocket on localhost)
             v
           Browser tab running Moodle Playground
@@ -43,7 +43,7 @@ to it, and it forwards commands to the Moodle Playground running in your browser
 ### 1. Start the MCP server
 
 ```bash
-npx @moodle-playground/mcp-server
+npx @edwiser/moodle-playground-mcp
 ```
 
 This starts the MCP server and opens the playground in your browser automatically.
@@ -55,7 +55,7 @@ The server bridges commands from your AI tool to the running playground.
 
     ```bash
     claude mcp add --transport stdio --scope user \
-      moodle-playground -- npx -y @moodle-playground/mcp-server
+      moodle-playground -- npx -y @edwiser/moodle-playground-mcp
     ```
 
     Or add to `.claude/settings.json`:
@@ -65,7 +65,7 @@ The server bridges commands from your AI tool to the running playground.
       "mcpServers": {
         "moodle-playground": {
           "command": "npx",
-          "args": ["-y", "@moodle-playground/mcp-server"]
+          "args": ["-y", "@edwiser/moodle-playground-mcp"]
         }
       }
     }
@@ -80,7 +80,7 @@ The server bridges commands from your AI tool to the running playground.
       "mcpServers": {
         "moodle-playground": {
           "command": "npx",
-          "args": ["-y", "@moodle-playground/mcp-server"]
+          "args": ["-y", "@edwiser/moodle-playground-mcp"]
         }
       }
     }
@@ -95,7 +95,7 @@ The server bridges commands from your AI tool to the running playground.
       "mcpServers": {
         "moodle-playground": {
           "command": "npx",
-          "args": ["-y", "@moodle-playground/mcp-server"]
+          "args": ["-y", "@edwiser/moodle-playground-mcp"]
         }
       }
     }
@@ -106,7 +106,7 @@ The server bridges commands from your AI tool to the running playground.
 Agent skills provide context and reference documentation to your AI tool:
 
 ```bash
-npx @moodle-playground/agent-skills --agent claude --global
+npx @edwiser/moodle-playground-agent-skills --agent claude --global
 ```
 
 ## Example: Your first AI-powered session
@@ -205,20 +205,20 @@ Install skills:
 
 ```bash
 # Claude Code (global)
-npx @moodle-playground/agent-skills --agent claude --global
+npx @edwiser/moodle-playground-agent-skills --agent claude --global
 
 # Cursor (project-level)
-npx @moodle-playground/agent-skills --agent cursor --local
+npx @edwiser/moodle-playground-agent-skills --agent cursor --local
 
 # Specific skill only
-npx @moodle-playground/agent-skills --skill moodle-plugin-development
+npx @edwiser/moodle-playground-agent-skills --skill moodle-plugin-development
 ```
 
 ## Architecture
 
 The MCP integration follows the same pattern as WordPress Playground:
 
-1. **MCP Server** (`@moodle-playground/mcp`) — Node.js CLI that implements the
+1. **MCP Server** (`@edwiser/moodle-playground-mcp`) — Node.js CLI that implements the
    MCP protocol over stdio and bridges to the browser via WebSocket
 2. **WebSocket Bridge** — Connects the MCP server to the browser playground
    on `localhost:7999` with token-based authentication

@@ -2,7 +2,7 @@
   "mcpServers": {
     "moodle-playground": {
       "command": "npx",
-      "args": ["-y", "@moodle-playground/mcp-server"],
+      "args": ["-y", "@edwiser/moodle-playground-mcp"],
       "env": {}
     }
   }

@@ -131,7 +131,7 @@ See the [Architecture overview](architecture.md) for the full picture.
 
 - :material-code-tags: **JavaScript client library**
 
-    `@moodle-playground/client` for programmatic control.
+    `@edwiser/moodle-playground-client` for programmatic control.
 
 - :material-robot: **AI agent integration**
 

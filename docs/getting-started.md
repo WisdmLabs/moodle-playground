@@ -205,7 +205,7 @@ http://localhost:8080/?blueprint-url=/path/to/demo.blueprint.json
 Control the playground from Claude Code, Cursor, or other AI tools:
 
 ```bash
-npx @moodle-playground/mcp-server
+npx @edwiser/moodle-playground-mcp
 ```
 
 This connects your AI assistant to the playground so you can ask it to create

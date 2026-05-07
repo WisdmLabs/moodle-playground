@@ -1,4 +1,4 @@
-# @moodle-playground/client
+# @edwiser/moodle-playground-client
 
 Embed and programmatically control Moodle Playground instances.
 
@@ -7,7 +7,7 @@ Embed and programmatically control Moodle Playground instances.
 ```html
 <iframe id="playground" style="width:100%;height:600px;border:none"></iframe>
 <script type="module">
-  import { startMoodlePlayground } from '@moodle-playground/client';
+  import { startMoodlePlayground } from '@edwiser/moodle-playground-client';
 
   const iframe = document.getElementById('playground');
   const playground = await startMoodlePlayground(iframe, {

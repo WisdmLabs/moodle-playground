@@ -8,10 +8,10 @@ The MCP server uses stdio transport (for Claude Code, Cursor, etc.) and bridges 
 
 ```bash
 # Start the MCP server
-npx @moodle-playground/mcp-server
+npx @edwiser/moodle-playground-mcp
 
 # With options
-npx @moodle-playground/mcp-server --port 7999 --no-open
+npx @edwiser/moodle-playground-mcp --port 7999 --no-open
 ```
 
 The server prints a connection URL to stderr. Open it in a browser to connect the playground.

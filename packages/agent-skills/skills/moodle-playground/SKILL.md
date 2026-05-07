@@ -9,7 +9,7 @@ You are working with **Moodle Playground**, a browser-based Moodle environment p
 ```html
 <iframe id="playground" style="width:100%;height:600px;border:none;"></iframe>
 <script type="module">
-  import { startMoodlePlayground } from '@moodle-playground/client';
+  import { startMoodlePlayground } from '@edwiser/moodle-playground-client';
   const client = await startMoodlePlayground(
     document.getElementById('playground'),
     { moodleVersion: '5.0', phpVersion: '8.3' }
@@ -21,7 +21,7 @@ You are working with **Moodle Playground**, a browser-based Moodle environment p
 ### Use the MCP server (AI agents)
 
 ```bash
-npx @moodle-playground/mcp-server
+npx @edwiser/moodle-playground-mcp
 ```
 
 This starts a stdio-based MCP server that connects to a running playground instance via WebSocket. Configure it in your AI tool's MCP settings.

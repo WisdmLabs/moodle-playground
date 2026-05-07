@@ -88,7 +88,7 @@ src/
   shared/                # Shared utilities
   styles/app.css         # App stylesheet
 packages/
-  client/                # @moodle-playground/client library
+  client/                # @edwiser/moodle-playground-client library
     src/index.js         # startMoodlePlayground() and client API
 patches/shared/          # Canonical shared build-time patches
 patches/moodle/          # Legacy fallback patch root

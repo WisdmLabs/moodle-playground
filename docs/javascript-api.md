@@ -1,18 +1,18 @@
 # JavaScript Client API
 
-The `@moodle-playground/client` package provides a programmatic API for embedding
+The `@edwiser/moodle-playground-client` package provides a programmatic API for embedding
 and controlling Moodle Playground instances from JavaScript.
 
 ## Installation
 
 ```bash
-npm install @moodle-playground/client
+npm install @edwiser/moodle-playground-client
 ```
 
 ## Quick Start
 
 ```javascript
-import { startMoodlePlayground } from '@moodle-playground/client';
+import { startMoodlePlayground } from '@edwiser/moodle-playground-client';
 
 const iframe = document.createElement('iframe');
 iframe.style.cssText = 'width:100%;height:600px;border:none';

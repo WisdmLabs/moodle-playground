@@ -19,7 +19,7 @@ Moodle Playground runs [Moodle](https://moodle.org) entirely in the browser usin
 - **Seamless & lazy modes** — embed as a borderless iframe or defer boot until the user clicks
 - **Site export / import** — snapshot the full playground state as a ZIP and restore it later
 - **Shareable URLs** — share blueprint links or GitHub Gists with one click
-- **JavaScript client library** — `@moodle-playground/client` for programmatic control
+- **JavaScript client library** — `@edwiser/moodle-playground-client` for programmatic control
 - **AI agent integration** — MCP server with 21 tools, resources, prompts, and agent skills for Claude, Cursor, and Copilot
 - **Crash recovery** — automatic runtime restart with state preservation on WASM OOM
 - **Multiple Moodle versions** — 4.4, 4.5, 5.0, and more built in parallel
@@ -185,7 +185,7 @@ Embed a Moodle Playground in any web page using an iframe:
 For programmatic control, use the JavaScript client library:
 
 ```javascript
-import { startMoodlePlayground } from '@moodle-playground/client';
+import { startMoodlePlayground } from '@edwiser/moodle-playground-client';
 
 const playground = await startMoodlePlayground(iframe, {
   moodleVersion: '5.0',
@@ -205,14 +205,14 @@ Control the playground from AI coding assistants via the MCP server:
 
 ```bash
 # Start the MCP server
-npx @moodle-playground/mcp-server
+npx @edwiser/moodle-playground-mcp
 
 # Add to Claude Code
 claude mcp add --transport stdio --scope user \
-  moodle-playground -- npx -y @moodle-playground/mcp-server
+  moodle-playground -- npx -y @edwiser/moodle-playground-mcp
 
 # Install agent skills
-npx @moodle-playground/agent-skills --agent claude --global
+npx @edwiser/moodle-playground-agent-skills --agent claude --global
 ```
 
 21 tools, 7 resources, and 5 prompts for navigating, executing PHP, managing files, installing plugins, and more. See the [AI Integration guide](docs/ai-integration.md).

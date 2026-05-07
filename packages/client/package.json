@@ -1,5 +1,5 @@
 {
-  "name": "@moodle-playground/client",
+  "name": "@edwiser/moodle-playground-client",
   "version": "0.1.0",
   "description": "Embed and control Moodle Playground instances programmatically",
   "type": "module",

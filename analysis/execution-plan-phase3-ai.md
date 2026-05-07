@@ -15,7 +15,7 @@ currently has an MVP postMessage bridge with 7 tools and no standalone server.
 │  AI Client (Claude Code, Cursor, Gemini CLI, VS Code)             │
 │     ↕ stdio                                                       │
 ├────────────────────────────────────────────────────────────────────┤
-│  @moodle-playground/mcp  (Node.js CLI)                            │
+│  @edwiser/moodle-playground-mcp  (Node.js CLI)                            │
 │     ↕ WebSocket (localhost:7999)                                  │
 ├────────────────────────────────────────────────────────────────────┤
 │  Browser — Moodle Playground                                      │
@@ -29,7 +29,7 @@ This mirrors WordPress Playground's architecture exactly.
 
 ---
 
-## Phase 3a: Standalone MCP Server (`@moodle-playground/mcp`)
+## Phase 3a: Standalone MCP Server (`@edwiser/moodle-playground-mcp`)
 
 **Priority:** Critical — this is the #1 gap. Without a standalone server, no AI agent
 can connect to Moodle Playground via standard MCP tooling.
@@ -47,7 +47,7 @@ can connect to Moodle Playground via standard MCP tooling.
 **Implementation:**
 
 1. **Package setup** (`packages/mcp/package.json`)
-   - Name: `@moodle-playground/mcp`
+   - Name: `@edwiser/moodle-playground-mcp`
    - Type: `module`
    - Bin: `{ "moodle-playground-mcp": "./bin/mcp-server.js" }`
    - Dependencies: `@modelcontextprotocol/sdk` (official MCP SDK for Node.js)
@@ -166,7 +166,7 @@ without manual configuration.
 
 ### WS16: Publishable Agent Skills
 
-Create `@moodle-playground/agent-skills` — a skills package installable via
+Create `@edwiser/moodle-playground-agent-skills` — a skills package installable via
 `npx skills add` for Claude Code, Cursor, and Copilot.
 
 **New files:**
@@ -185,9 +185,9 @@ Create `@moodle-playground/agent-skills` — a skills package installable via
 Content for `SKILL.md`:
 - When to use: spinning up Moodle environments, testing plugins, running PHP,
   creating courses/users, exporting/importing state
-- Prerequisites: `npx @moodle-playground/mcp` or browser-based playground
+- Prerequisites: `npx @edwiser/moodle-playground-mcp` or browser-based playground
 - Procedure:
-  1. Start MCP server (`npx @moodle-playground/mcp`)
+  1. Start MCP server (`npx @edwiser/moodle-playground-mcp`)
   2. Open playground in browser (auto-opened or manual)
   3. Use MCP tools to control the instance
 - Available tools: full list of 21 tools with input schemas
@@ -221,13 +221,13 @@ Reference files:
 
 ```bash
 # Claude Code
-npx skills add @moodle-playground/agent-skills --skill moodle-playground
+npx skills add @edwiser/moodle-playground-agent-skills --skill moodle-playground
 
 # Cursor
-npx skills add @moodle-playground/agent-skills --agent cursor --skill moodle-playground
+npx skills add @edwiser/moodle-playground-agent-skills --agent cursor --skill moodle-playground
 
 # All skills, all agents
-npx skills add @moodle-playground/agent-skills
+npx skills add @edwiser/moodle-playground-agent-skills
 ```
 
 The `install.js` script:
@@ -255,7 +255,7 @@ Pre-built configuration snippets for popular AI clients.
     "moodle-playground": {
       "type": "stdio",
       "command": "npx",
-      "args": ["-y", "@moodle-playground/mcp"]
+      "args": ["-y", "@edwiser/moodle-playground-mcp"]
     }
   }
 }
@@ -263,7 +263,7 @@ Pre-built configuration snippets for popular AI clients.
 
 **CLI one-liner:**
 ```bash
-claude mcp add --transport stdio --scope user moodle-playground -- npx -y @moodle-playground/mcp
+claude mcp add --transport stdio --scope user moodle-playground -- npx -y @edwiser/moodle-playground-mcp
 ```
 
 ---
@@ -395,10 +395,10 @@ Phase 3d (Medium)
 
 ## Success Criteria
 
-1. `npx @moodle-playground/mcp` starts a server that Claude Code can connect to
-2. `claude mcp add moodle-playground -- npx -y @moodle-playground/mcp` works out of the box
+1. `npx @edwiser/moodle-playground-mcp` starts a server that Claude Code can connect to
+2. `claude mcp add moodle-playground -- npx -y @edwiser/moodle-playground-mcp` works out of the box
 3. All 21 tools callable from Claude Code and return correct results
-4. Agent skills installable via `npx skills add @moodle-playground/agent-skills`
+4. Agent skills installable via `npx skills add @edwiser/moodle-playground-agent-skills`
 5. Browser auto-opens with WebSocket connection when MCP server starts
 6. Resources and prompts visible in Claude Code's MCP tool list
 7. Zero regressions in existing test suite

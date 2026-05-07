@@ -7,12 +7,12 @@ to control the playground programmatically.
 
 ### Standalone MCP Server (recommended)
 
-The `@moodle-playground/mcp-server` package provides a full MCP server that
+The `@edwiser/moodle-playground-mcp` package provides a full MCP server that
 AI agents connect to via stdio. The server bridges to the browser playground
 via WebSocket.
 
 ```bash
-npx @moodle-playground/mcp-server
+npx @edwiser/moodle-playground-mcp
 ```
 
 This is the recommended approach for Claude Code, Cursor, and other MCP-aware
@@ -97,7 +97,7 @@ MCP prompts provide guided workflows:
 ## Usage with Client Library
 
 ```javascript
-import { startMoodlePlayground } from '@moodle-playground/client';
+import { startMoodlePlayground } from '@edwiser/moodle-playground-client';
 
 const playground = await startMoodlePlayground(iframe, {
   mode: 'seamless',
