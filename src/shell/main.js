@@ -766,7 +766,19 @@ function renderGallery(data) {
         event.stopPropagation();
         const blueprintUrl =
           item.file || `./assets/blueprints/examples/${item.filename}`;
-        window.location.search = `?blueprint-url=${encodeURIComponent(blueprintUrl)}`;
+        const url = new URL(window.location.href);
+        url.search = "";
+        url.searchParams.set("blueprint-url", blueprintUrl);
+        const branchInfo = MOODLE_BRANCHES.find(
+          (b) => b.branch === currentMoodleBranch,
+        );
+        if (branchInfo) {
+          url.searchParams.set("moodle", branchInfo.version);
+        }
+        if (currentPhpVersion) {
+          url.searchParams.set("php", currentPhpVersion);
+        }
+        window.location.href = url.toString();
       });
       actions.append(launchBtn);
       card.append(actions);
