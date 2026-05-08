@@ -1630,6 +1630,12 @@ async function patchRuntimePhpSources(php, webRoot) {
 }`,
     ],
   ]);
+
+  // MDL-79753: replace deprecated data-toggle="slave" with data-toggle="target"
+  await patchFile(
+    `${webRoot}/lib/templates/checkbox-toggleall-slave.mustache`,
+    [['data-toggle="slave"', 'data-toggle="target"']],
+  );
 }
 
 async function prepareMoodleRuntime({
