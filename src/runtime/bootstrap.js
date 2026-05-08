@@ -769,6 +769,15 @@ try {
         }
     }
 
+    // Fix MathJax config: old snapshots may have MathJax 2 JS format
+    // ("MathJax.Hub.Config(...)") which fails JSON.parse in Moodle 4.5+ JS,
+    // breaking admin tab navigation.
+    $mjConfig = get_config('filter_mathjaxloader', 'mathjaxconfig');
+    if ($mjConfig !== false && $mjConfig !== '' && strpos($mjConfig, 'MathJax') === 0) {
+        set_config('mathjaxconfig', '', 'filter_mathjaxloader');
+        $result['set']['filter_mathjaxloader/mathjaxconfig'] = '(cleared legacy MathJax 2 config)';
+    }
+
     $sitename = get_config('core', 'fullname');
     if ($sitename === false || $sitename === null || $sitename === '') {
         $sitename = 'Moodle Playground';
