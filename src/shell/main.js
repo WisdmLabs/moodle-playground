@@ -149,6 +149,11 @@ function appendLog(message, isError = false) {
   els.logPanel.scrollTop = els.logPanel.scrollHeight;
 }
 
+function handleBeforeUnload(event) {
+  event.preventDefault();
+  event.returnValue = "";
+}
+
 function setUiLocked(locked) {
   uiLocked = locked;
   els.address.disabled = locked;
@@ -158,6 +163,12 @@ function setUiLocked(locked) {
   els.importInput.disabled = locked;
   if (els.exportSiteButton) els.exportSiteButton.disabled = locked;
   els.addressForm.classList.toggle("is-disabled", locked);
+
+  if (locked) {
+    window.addEventListener("beforeunload", handleBeforeUnload);
+  } else {
+    window.removeEventListener("beforeunload", handleBeforeUnload);
+  }
 }
 
 async function ensureRuntimeServiceWorker() {
