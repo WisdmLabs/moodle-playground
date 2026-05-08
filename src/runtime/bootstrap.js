@@ -1636,6 +1636,18 @@ async function patchRuntimePhpSources(php, webRoot) {
     `${webRoot}/lib/templates/checkbox-toggleall-slave.mustache`,
     [['data-toggle="slave"', 'data-toggle="target"']],
   );
+
+  // MDL-70990: replace deprecated triggerUpload* calls with notifyUpload*
+  await patchFile(`${webRoot}/lib/form/dndupload.js`, [
+    [
+      "FormEvent.triggerUploadCompleted(elementId)",
+      "FormEvent.notifyUploadCompleted(elementId)",
+    ],
+    [
+      "FormEvent.triggerUploadStarted(elementId)",
+      "FormEvent.notifyUploadStarted(elementId)",
+    ],
+  ]);
 }
 
 async function prepareMoodleRuntime({
