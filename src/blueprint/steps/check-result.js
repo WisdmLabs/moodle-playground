@@ -15,4 +15,12 @@ export function checkPhpResult(result, stepName) {
       `${stepName}: PHP returned failure: ${text.substring(0, 500)}`,
     );
   }
+  if (!text || !text.includes('"ok"')) {
+    const detail = errors
+      ? `PHP errors: ${errors.substring(0, 300)}`
+      : "empty response";
+    throw new Error(
+      `${stepName}: PHP script produced no valid output (${detail})`,
+    );
+  }
 }

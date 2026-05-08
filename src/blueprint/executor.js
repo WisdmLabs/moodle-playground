@@ -42,6 +42,7 @@ export async function executeBlueprint(blueprint, context) {
   };
 
   let landingPage = resolvedBlueprint.landingPage || null;
+  const failures = [];
 
   for (let i = 0; i < steps.length; i++) {
     const step = steps[i];
@@ -53,12 +54,10 @@ export async function executeBlueprint(blueprint, context) {
 
     const handler = getStepHandler(stepName);
     if (!handler) {
-      return {
-        success: false,
-        landingPage,
-        failedStep: `${i + 1}:${stepName}`,
-        error: `Unknown step type: ${stepName}`,
-      };
+      const message = `Unknown step type: ${stepName}`;
+      publish(`Blueprint step ${stepName} failed: ${message}`, progress);
+      failures.push({ step: `${i + 1}:${stepName}`, error: message });
+      continue;
     }
 
     try {
@@ -74,13 +73,17 @@ export async function executeBlueprint(blueprint, context) {
     } catch (error) {
       const message = error?.message || String(error);
       publish(`Blueprint step ${stepName} failed: ${message}`, progress);
-      return {
-        success: false,
-        landingPage,
-        failedStep: `${i + 1}:${stepName}`,
-        error: message,
-      };
+      failures.push({ step: `${i + 1}:${stepName}`, error: message });
     }
+  }
+
+  if (failures.length > 0) {
+    return {
+      success: false,
+      landingPage,
+      failedStep: failures[0].step,
+      error: failures.map((f) => `${f.step}: ${f.error}`).join("; "),
+    };
   }
 
   return {
