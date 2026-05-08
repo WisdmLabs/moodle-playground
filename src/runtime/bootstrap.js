@@ -741,6 +741,13 @@ try {
     $CFG->debug = ${normalizedDebug};
     $CFG->debugdeveloper = (${normalizedDebug} >= 32767);
 
+    // Ephemeral runtime — session timeout is meaningless and the JS
+    // warning triggers 500 errors on the AJAX service endpoint.
+    set_config('sessiontimeout', '31536000');
+    set_config('sessiontimeoutwarning', '0');
+    $CFG->sessiontimeout = 31536000;
+    $CFG->sessiontimeoutwarning = 0;
+
     $pluginDefaults = [
         'moodlecourse' => [
             'hiddensections' => '1',
