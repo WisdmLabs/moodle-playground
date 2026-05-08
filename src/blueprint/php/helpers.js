@@ -255,17 +255,24 @@ export function phpCreateCategories(categories) {
     const description = escapePhp(cat.description || "");
     const parent = cat.parent ? `'${escapePhp(cat.parent)}'` : "null";
     return `
-$data${i} = new stdClass();
-$data${i}->name = '${name}';
-$data${i}->description = '${description}';
-$data${i}->descriptionformat = FORMAT_HTML;
+$parentId${i} = 0;
 if (${parent} !== null) {
     $parentCat = $DB->get_record('course_categories', ['name' => ${parent}], 'id');
     if ($parentCat) {
-        $data${i}->parent = $parentCat->id;
+        $parentId${i} = $parentCat->id;
     }
 }
-$catIds[] = core_course_category::create($data${i})->id;`;
+$existing${i} = $DB->get_record('course_categories', ['name' => '${name}', 'parent' => $parentId${i}], 'id');
+if ($existing${i}) {
+    $catIds[] = $existing${i}->id;
+} else {
+    $data${i} = new stdClass();
+    $data${i}->name = '${name}';
+    $data${i}->description = '${description}';
+    $data${i}->descriptionformat = FORMAT_HTML;
+    $data${i}->parent = $parentId${i};
+    $catIds[] = core_course_category::create($data${i})->id;
+}`;
   });
 
   return `${CLI_HEADER}
