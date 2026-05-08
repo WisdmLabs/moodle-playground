@@ -951,11 +951,11 @@ echo json_encode(['ok' => true]);`);
       }
       case "import-site": {
         const { importPlaygroundZip } = await import("./src/persistence/import.js");
-        const meta = importPlaygroundZip(data.data, php, {
+        const { metadata } = importPlaygroundZip(data.data, php, {
           dbFilePath: buildDbPath(),
           webRoot: activeWebRoot,
         });
-        replyOk({ metadata: meta });
+        replyOk({ metadata });
         break;
       }
       case "get-blueprint": {
@@ -1064,11 +1064,29 @@ function installMessageListener() {
         runtimeStatePromise.then(async (state) => {
           try {
             const { importPlaygroundZip } = await import("./src/persistence/import.js");
-            const meta = importPlaygroundZip(event.data.data, state.php, {
+            const { metadata, pluginFiles } = importPlaygroundZip(event.data.data, state.php, {
               dbFilePath: buildDbPath(),
               webRoot: activeWebRoot,
             });
-            postShell({ kind: "site-import-complete", metadata: meta });
+
+            // Persist imported data so it survives the page reload
+            if (persistenceStore) {
+              const rawPhp = state.php._php;
+              const dbPath = buildDbPath();
+              const dbData = rawPhp.readFileAsBuffer(dbPath);
+              if (dbData && dbData.byteLength > 0) {
+                await persistenceStore.saveFile(dbPath, new Uint8Array(dbData));
+              }
+              const FILEDIR_PATH = "/persist/moodledata/filedir";
+              if (rawPhp.fileExists(FILEDIR_PATH) && rawPhp.isDir(FILEDIR_PATH)) {
+                await persistenceStore.saveDirectory(state.php, FILEDIR_PATH);
+              }
+              for (const { path, data } of pluginFiles) {
+                await persistenceStore.saveFile(path, data);
+              }
+            }
+
+            postShell({ kind: "site-import-complete", metadata });
           } catch (error) {
             postShell({ kind: "error", detail: `Import failed: ${error.message}` });
           }

@@ -17,7 +17,7 @@ import { unzipSync } from "fflate";
  * @param {object} [options]
  * @param {string} [options.dbFilePath] - Full path to write the SQLite DB file
  * @param {string} [options.webRoot] - Moodle webroot (default "/www/moodle")
- * @returns {object} Parsed metadata from playground.json
+ * @returns {{metadata: object, pluginFiles: Array<{path: string, data: Uint8Array}>}}
  */
 export function importPlaygroundZip(zipBuffer, php, options = {}) {
   const rawPhp = php._php || php;
@@ -45,17 +45,19 @@ export function importPlaygroundZip(zipBuffer, php, options = {}) {
     }
   }
 
-  // 4. Restore plugins
+  // 4. Restore plugins — track written files for persistence
   const webRoot = options.webRoot || "/www/moodle";
+  const pluginFiles = [];
   for (const [path, data] of Object.entries(files)) {
     if (path.startsWith("plugins/") && data.length > 0) {
       const target = `${webRoot}/${path.slice("plugins/".length)}`;
       ensureParentDir(rawPhp, target);
       rawPhp.writeFile(target, data);
+      pluginFiles.push({ path: target, data });
     }
   }
 
-  return metadata;
+  return { metadata, pluginFiles };
 }
 
 /**
